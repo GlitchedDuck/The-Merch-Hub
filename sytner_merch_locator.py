@@ -2,55 +2,77 @@ import streamlit as st
 import datetime
 from typing import Dict, List
 
-# ============================================================================
-# CONFIGURATION & STYLING
-# ============================================================================
-
 st.set_page_config(
-    page_title="Sytner Merchandise Locator",
+    page_title="The Merch Hub",
     page_icon="🛍️",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Brand colors
-PRIMARY = "#1e3a8a"  # Sytner blue
-ACCENT = "#3b82f6"   # Lighter blue
-SUCCESS = "#22c55e"  # Green
+# Sytner authentic brand colors
+PRIMARY = "#1a1a1a"
+SECONDARY = "#333333"
+ACCENT = "#666666"
+LIGHT_GREY = "#f5f5f5"
+BORDER = "#e5e5e5"
+SUCCESS = "#22c55e"
 
-# Custom CSS
+# Custom CSS - Sytner minimal aesthetic
 st.markdown(f"""
 <style>
     .stApp {{
-        background-color: #f8fafc;
+        background-color: {LIGHT_GREY};
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
     }}
     
-    /* Hide Streamlit branding */
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
     
-    /* Custom button styling */
     .stButton > button {{
-        border-radius: 8px;
-        font-weight: 600;
-        transition: all 0.3s ease;
+        border-radius: 0;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 12px;
+        transition: all 0.2s ease;
+        border: 2px solid {PRIMARY};
     }}
     
-    /* Tabs styling */
+    .stButton > button:hover {{
+        background-color: {PRIMARY};
+        color: white;
+    }}
+    
     .stTabs [data-baseweb="tab-list"] {{
-        gap: 8px;
+        gap: 0;
+        border-bottom: 2px solid {BORDER};
     }}
     
     .stTabs [data-baseweb="tab"] {{
-        background-color: white;
-        border-radius: 8px;
-        padding: 12px 24px;
-        font-weight: 600;
+        background-color: transparent;
+        border-radius: 0;
+        padding: 16px 32px;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        font-size: 12px;
+        color: {ACCENT};
     }}
     
     .stTabs [aria-selected="true"] {{
-        background-color: {PRIMARY};
-        color: white;
+        background-color: transparent;
+        color: {PRIMARY};
+        border-bottom: 3px solid {PRIMARY};
+    }}
+    
+    .stTextInput > div > div > input {{
+        border-radius: 0;
+        border: 1px solid {BORDER};
+    }}
+    
+    .stSelectbox > div > div {{
+        border-radius: 0;
+        border: 1px solid {BORDER};
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -63,746 +85,709 @@ DEALERSHIPS = {
     "Sytner BMW Cardiff": {
         "region": "South Wales",
         "contact": "merchandise@sytnercardiff.co.uk",
-        "phone": "029 2046 8000"
-    },
-    "Sytner BMW Leicester": {
-        "region": "East Midlands",
-        "contact": "merchandise@sytnerleicester.co.uk",
-        "phone": "0116 234 5678"
-    },
-    "Sytner BMW Nottingham": {
-        "region": "East Midlands",
-        "contact": "merchandise@sytnernottingham.co.uk",
-        "phone": "0115 789 0123"
-    },
-    "Sytner BMW Solihull": {
-        "region": "West Midlands",
-        "contact": "merchandise@sytnersolihull.co.uk",
-        "phone": "0121 789 4561"
+        "phone": "029 2046 8000",
+        "brands": ["BMW", "MINI"]
     },
     "Sytner BMW Sheffield": {
-        "region": "South Yorkshire",
+        "region": "Yorkshire",
         "contact": "merchandise@sytnersheffield.co.uk",
-        "phone": "0114 567 8901"
+        "phone": "0114 567 8901",
+        "brands": ["BMW", "MINI"]
     },
-    "Sytner BMW Coventry": {
-        "region": "West Midlands",
-        "contact": "merchandise@sytnercoventry.co.uk",
-        "phone": "024 7655 4321"
+    "Sytner Audi Leicester": {
+        "region": "East Midlands",
+        "contact": "merchandise@sytnerleicester.co.uk",
+        "phone": "0116 234 5678",
+        "brands": ["Audi"]
     },
-    "Sytner BMW Newport": {
+    "Sytner Audi Newport": {
         "region": "South Wales",
         "contact": "merchandise@sytnernewport.co.uk",
-        "phone": "01633 456 789"
+        "phone": "01633 456 789",
+        "brands": ["Audi"]
     },
-    "Sytner BMW Oldbury": {
+    "Sytner Mercedes-Benz Nottingham": {
+        "region": "East Midlands",
+        "contact": "merchandise@sytnernottingham.co.uk",
+        "phone": "0115 789 0123",
+        "brands": ["Mercedes-Benz"]
+    },
+    "Sytner Porsche Solihull": {
+        "region": "West Midlands",
+        "contact": "merchandise@sytnersolihull.co.uk",
+        "phone": "0121 789 4561",
+        "brands": ["Porsche"]
+    },
+    "Sytner Jaguar Land Rover Coventry": {
+        "region": "West Midlands",
+        "contact": "merchandise@sytnercoventry.co.uk",
+        "phone": "024 7655 4321",
+        "brands": ["Jaguar", "Land Rover"]
+    },
+    "Sytner Volkswagen Oldbury": {
         "region": "West Midlands",
         "contact": "merchandise@sytneroldbury.co.uk",
-        "phone": "0121 456 7890"
+        "phone": "0121 456 7890",
+        "brands": ["Volkswagen"]
+    },
+    "Sytner Ferrari Birmingham": {
+        "region": "West Midlands",
+        "contact": "merchandise@sytnerferrari.co.uk",
+        "phone": "0121 555 0100",
+        "brands": ["Ferrari"]
+    },
+    "Sytner Lamborghini London": {
+        "region": "London",
+        "contact": "merchandise@sytnerlamborghini.co.uk",
+        "phone": "020 7123 4567",
+        "brands": ["Lamborghini"]
+    },
+    "Sytner Bentley Manchester": {
+        "region": "North West",
+        "contact": "merchandise@sytnerbentley.co.uk",
+        "phone": "0161 234 5678",
+        "brands": ["Bentley"]
+    },
+    "Sytner Rolls-Royce London": {
+        "region": "London",
+        "contact": "merchandise@sytnerrolls.co.uk",
+        "phone": "020 7987 6543",
+        "brands": ["Rolls-Royce"]
+    },
+    "Sytner Aston Martin Bristol": {
+        "region": "South West",
+        "contact": "merchandise@sytneraston.co.uk",
+        "phone": "0117 345 6789",
+        "brands": ["Aston Martin"]
+    },
+    "Sytner McLaren Birmingham": {
+        "region": "West Midlands",
+        "contact": "merchandise@sytnermclaren.co.uk",
+        "phone": "0121 888 9999",
+        "brands": ["McLaren"]
+    },
+    "Sytner Maserati Leeds": {
+        "region": "Yorkshire",
+        "contact": "merchandise@sytnermaserati.co.uk",
+        "phone": "0113 567 8901",
+        "brands": ["Maserati"]
     }
 }
 
 MERCHANDISE_CATALOG = [
-    # Apparel
-    {
-        "id": "MERCH001",
-        "name": "BMW M Sport Polo Shirt",
-        "category": "Apparel",
-        "description": "Premium cotton polo with embroidered M logo",
-        "price": 35.00,
-        "sizes": ["S", "M", "L", "XL", "XXL"],
-        "colors": ["Navy", "Black", "White"],
-        "image": "👕",
-        "dealerships": ["Sytner BMW Cardiff", "Sytner BMW Leicester", "Sytner BMW Solihull"],
-        "stock_levels": {"Sytner BMW Cardiff": 25, "Sytner BMW Leicester": 18, "Sytner BMW Solihull": 32}
-    },
-    {
-        "id": "MERCH002",
-        "name": "Sytner Branded Fleece Jacket",
-        "category": "Apparel",
-        "description": "Soft fleece with Sytner logo, perfect for showroom",
-        "price": 45.00,
-        "sizes": ["S", "M", "L", "XL", "XXL"],
-        "colors": ["Navy", "Grey"],
-        "image": "🧥",
-        "dealerships": ["Sytner BMW Nottingham", "Sytner BMW Coventry", "Sytner BMW Sheffield"],
-        "stock_levels": {"Sytner BMW Nottingham": 15, "Sytner BMW Coventry": 22, "Sytner BMW Sheffield": 12}
-    },
-    {
-        "id": "MERCH003",
-        "name": "BMW Performance Cap",
-        "category": "Apparel",
-        "description": "Adjustable cap with BMW Motorsport colors",
-        "price": 22.00,
-        "sizes": ["One Size"],
-        "colors": ["Black/Blue", "Navy/White", "Red/White"],
-        "image": "🧢",
-        "dealerships": ["Sytner BMW Cardiff", "Sytner BMW Newport", "Sytner BMW Oldbury"],
-        "stock_levels": {"Sytner BMW Cardiff": 40, "Sytner BMW Newport": 28, "Sytner BMW Oldbury": 35}
-    },
+    # BMW Merchandise
+    {"id":"BMW001","brand":"BMW","name":"BMW M Sport Polo Shirt","category":"Apparel","description":"Premium cotton polo with embroidered M logo, perfect for showroom or casual wear","price":45.00,"sizes":["S","M","L","XL","XXL"],"colors":["Navy","Black","White"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner BMW Cardiff":25,"Sytner BMW Sheffield":18},"special_order_fee":0},
+    {"id":"BMW002","brand":"BMW","name":"BMW Performance Cap","category":"Apparel","description":"Adjustable cap with BMW Motorsport colors and branding","price":28.00,"sizes":["One Size"],"colors":["Black/Blue","Navy/White"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner BMW Cardiff":40,"Sytner BMW Sheffield":32},"special_order_fee":0},
+    {"id":"BMW003","brand":"BMW","name":"BMW Insulated Travel Mug","category":"Drinkware","description":"Stainless steel mug, keeps drinks hot for 6 hours","price":22.00,"sizes":["500ml"],"colors":["Silver","Black"],"image":"☕","stock_type":"in_stock","stock_levels":{"Sytner BMW Cardiff":45,"Sytner BMW Sheffield":38},"special_order_fee":0},
+    {"id":"BMW004","brand":"BMW","name":"BMW Model Car (1:43 Scale)","category":"Collectibles","description":"Die-cast model car, various BMW series available","price":75.00,"sizes":["1:43"],"colors":["Various Models"],"image":"🏎️","stock_type":"special_order","stock_levels":{},"special_order_fee":5.00},
+    {"id":"BMW005","brand":"BMW","name":"BMW Wireless Charger","category":"Tech","description":"Fast wireless charging pad with BMW logo illumination","price":38.00,"sizes":["Standard"],"colors":["Black"],"image":"📱","stock_type":"in_stock","stock_levels":{"Sytner BMW Sheffield":12},"special_order_fee":0},
+    {"id":"BMW006","brand":"BMW","name":"BMW Sport Backpack","category":"Bags","description":"Water-resistant backpack with laptop compartment","price":75.00,"sizes":["One Size"],"colors":["Navy","Black"],"image":"🎒","stock_type":"in_stock","stock_levels":{"Sytner BMW Cardiff":8},"special_order_fee":0},
     
-    # Drinkware
-    {
-        "id": "MERCH004",
-        "name": "BMW Insulated Travel Mug",
-        "category": "Drinkware",
-        "description": "Stainless steel, keeps drinks hot for 6 hours",
-        "price": 18.00,
-        "sizes": ["500ml"],
-        "colors": ["Silver", "Black"],
-        "image": "☕",
-        "dealerships": ["Sytner BMW Leicester", "Sytner BMW Solihull", "Sytner BMW Coventry"],
-        "stock_levels": {"Sytner BMW Leicester": 45, "Sytner BMW Solihull": 38, "Sytner BMW Coventry": 50}
-    },
-    {
-        "id": "MERCH005",
-        "name": "Sytner Water Bottle",
-        "category": "Drinkware",
-        "description": "BPA-free sports bottle with flip cap",
-        "price": 12.00,
-        "sizes": ["750ml"],
-        "colors": ["Blue", "Black", "White"],
-        "image": "🧴",
-        "dealerships": ["Sytner BMW Nottingham", "Sytner BMW Sheffield", "Sytner BMW Newport"],
-        "stock_levels": {"Sytner BMW Nottingham": 60, "Sytner BMW Sheffield": 42, "Sytner BMW Newport": 55}
-    },
+    # Audi Merchandise
+    {"id":"AUDI001","brand":"Audi","name":"Audi Sport Jacket","category":"Apparel","description":"Water-resistant jacket with Audi Sport branding","price":85.00,"sizes":["S","M","L","XL","XXL"],"colors":["Grey","Black"],"image":"🧥","stock_type":"in_stock","stock_levels":{"Sytner Audi Leicester":15,"Sytner Audi Newport":12},"special_order_fee":0},
+    {"id":"AUDI002","brand":"Audi","name":"Audi Rings Keyring","category":"Accessories","description":"Premium metal keyring with four rings logo","price":18.00,"sizes":["Standard"],"colors":["Silver","Black"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner Audi Leicester":50,"Sytner Audi Newport":45},"special_order_fee":0},
+    {"id":"AUDI003","brand":"Audi","name":"Audi Sport Water Bottle","category":"Drinkware","description":"BPA-free sports bottle with Audi Sport design, 750ml","price":16.00,"sizes":["750ml"],"colors":["Red/Black","Grey"],"image":"🧴","stock_type":"in_stock","stock_levels":{"Sytner Audi Leicester":35,"Sytner Audi Newport":28},"special_order_fee":0},
+    {"id":"AUDI004","brand":"Audi","name":"Audi Collection Notebook","category":"Stationery","description":"A5 premium notebook with leather-effect cover","price":22.00,"sizes":["A5"],"colors":["Black"],"image":"📓","stock_type":"special_order","stock_levels":{},"special_order_fee":3.00},
+    {"id":"AUDI005","brand":"Audi","name":"Audi RS Performance Cap","category":"Apparel","description":"Audi RS line cap with embroidered logo","price":32.00,"sizes":["One Size"],"colors":["Black","Grey"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner Audi Leicester":22},"special_order_fee":0},
     
-    # Stationery
-    {
-        "id": "MERCH006",
-        "name": "BMW Branded Notebook Set",
-        "category": "Stationery",
-        "description": "A5 hardback notebooks, pack of 3",
-        "price": 15.00,
-        "sizes": ["A5"],
-        "colors": ["Mixed"],
-        "image": "📓",
-        "dealerships": ["Sytner BMW Cardiff", "Sytner BMW Leicester", "Sytner BMW Nottingham"],
-        "stock_levels": {"Sytner BMW Cardiff": 35, "Sytner BMW Leicester": 28, "Sytner BMW Nottingham": 40}
-    },
-    {
-        "id": "MERCH007",
-        "name": "Premium Pen Set",
-        "category": "Stationery",
-        "description": "Metal pens with BMW branding, gift box",
-        "price": 25.00,
-        "sizes": ["Standard"],
-        "colors": ["Silver/Blue"],
-        "image": "🖊️",
-        "dealerships": ["Sytner BMW Solihull", "Sytner BMW Coventry", "Sytner BMW Oldbury"],
-        "stock_levels": {"Sytner BMW Solihull": 20, "Sytner BMW Coventry": 18, "Sytner BMW Oldbury": 25}
-    },
+    # Mercedes-Benz Merchandise
+    {"id":"MERC001","brand":"Mercedes-Benz","name":"Mercedes-AMG Polo Shirt","category":"Apparel","description":"Performance polo with AMG branding and breathable fabric","price":52.00,"sizes":["S","M","L","XL","XXL"],"colors":["Black","Silver","Petronas Green"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner Mercedes-Benz Nottingham":22},"special_order_fee":0},
+    {"id":"MERC002","brand":"Mercedes-Benz","name":"Mercedes-Benz Star Cap","category":"Apparel","description":"Classic cap with three-pointed star embroidery","price":32.00,"sizes":["One Size"],"colors":["Black","Navy"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner Mercedes-Benz Nottingham":38},"special_order_fee":0},
+    {"id":"MERC003","brand":"Mercedes-Benz","name":"Mercedes-Benz Travel Mug","category":"Drinkware","description":"Premium insulated mug with star logo, 450ml","price":28.00,"sizes":["450ml"],"colors":["Silver","Black"],"image":"☕","stock_type":"in_stock","stock_levels":{"Sytner Mercedes-Benz Nottingham":30},"special_order_fee":0},
+    {"id":"MERC004","brand":"Mercedes-Benz","name":"Mercedes-AMG Model Car","category":"Collectibles","description":"1:43 scale AMG GT model with detailed interior","price":85.00,"sizes":["1:43"],"colors":["Various"],"image":"🏎️","stock_type":"special_order","stock_levels":{},"special_order_fee":8.00},
+    {"id":"MERC005","brand":"Mercedes-Benz","name":"Mercedes-Benz Leather Wallet","category":"Accessories","description":"Genuine leather wallet with Mercedes star","price":65.00,"sizes":["Standard"],"colors":["Black","Brown"],"image":"👛","stock_type":"special_order","stock_levels":{},"special_order_fee":5.00},
     
-    # Tech Accessories
-    {
-        "id": "MERCH008",
-        "name": "BMW Wireless Charger",
-        "category": "Tech",
-        "description": "Fast wireless charging pad with BMW logo",
-        "price": 35.00,
-        "sizes": ["Standard"],
-        "colors": ["Black"],
-        "image": "📱",
-        "dealerships": ["Sytner BMW Leicester", "Sytner BMW Sheffield", "Sytner BMW Cardiff"],
-        "stock_levels": {"Sytner BMW Leicester": 15, "Sytner BMW Sheffield": 12, "Sytner BMW Cardiff": 18}
-    },
-    {
-        "id": "MERCH009",
-        "name": "USB Memory Stick - 32GB",
-        "category": "Tech",
-        "description": "Premium metal USB with Sytner branding",
-        "price": 20.00,
-        "sizes": ["32GB"],
-        "colors": ["Silver", "Black"],
-        "image": "💾",
-        "dealerships": ["Sytner BMW Nottingham", "Sytner BMW Newport", "Sytner BMW Solihull"],
-        "stock_levels": {"Sytner BMW Nottingham": 30, "Sytner BMW Newport": 25, "Sytner BMW Solihull": 28}
-    },
+    # Porsche Merchandise
+    {"id":"POR001","brand":"Porsche","name":"Porsche Motorsport Jacket","category":"Apparel","description":"Premium jacket with Porsche crest and racing stripes","price":120.00,"sizes":["S","M","L","XL","XXL"],"colors":["Black","Guards Red"],"image":"🧥","stock_type":"special_order","stock_levels":{},"special_order_fee":10.00},
+    {"id":"POR002","brand":"Porsche","name":"Porsche Crest Keyring","category":"Accessories","description":"Enamel crest keyring, gift box included","price":35.00,"sizes":["Standard"],"colors":["Classic Crest"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner Porsche Solihull":25},"special_order_fee":0},
+    {"id":"POR003","brand":"Porsche","name":"Porsche Espresso Cup Set","category":"Drinkware","description":"Set of 2 porcelain espresso cups with crest","price":42.00,"sizes":["90ml"],"colors":["White/Crest"],"image":"☕","stock_type":"in_stock","stock_levels":{"Sytner Porsche Solihull":18},"special_order_fee":0},
+    {"id":"POR004","brand":"Porsche","name":"Porsche 911 Model (1:43)","category":"Collectibles","description":"Detailed 911 replica, various generations available","price":95.00,"sizes":["1:43"],"colors":["Various"],"image":"🏎️","stock_type":"special_order","stock_levels":{},"special_order_fee":8.00},
+    {"id":"POR005","brand":"Porsche","name":"Porsche Design Pen","category":"Stationery","description":"Premium ballpoint pen with Porsche Design branding","price":75.00,"sizes":["Standard"],"colors":["Silver","Black"],"image":"🖊️","stock_type":"special_order","stock_levels":{},"special_order_fee":6.00},
     
-    # Bags
-    {
-        "id": "MERCH010",
-        "name": "BMW Sport Backpack",
-        "category": "Bags",
-        "description": "Laptop compartment, water resistant",
-        "price": 55.00,
-        "sizes": ["One Size"],
-        "colors": ["Navy", "Black"],
-        "image": "🎒",
-        "dealerships": ["Sytner BMW Cardiff", "Sytner BMW Coventry", "Sytner BMW Sheffield"],
-        "stock_levels": {"Sytner BMW Cardiff": 12, "Sytner BMW Coventry": 15, "Sytner BMW Sheffield": 10}
-    },
-    {
-        "id": "MERCH011",
-        "name": "Sytner Tote Bag",
-        "category": "Bags",
-        "description": "Canvas tote with leather handles",
-        "price": 28.00,
-        "sizes": ["One Size"],
-        "colors": ["Navy", "Beige"],
-        "image": "👜",
-        "dealerships": ["Sytner BMW Leicester", "Sytner BMW Oldbury", "Sytner BMW Newport"],
-        "stock_levels": {"Sytner BMW Leicester": 20, "Sytner BMW Oldbury": 18, "Sytner BMW Newport": 22}
-    },
+    # Ferrari Merchandise
+    {"id":"FER001","brand":"Ferrari","name":"Scuderia Ferrari Team Shirt","category":"Apparel","description":"Official team polo with Prancing Horse logo","price":95.00,"sizes":["S","M","L","XL","XXL"],"colors":["Rosso Corsa","Black"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner Ferrari Birmingham":10},"special_order_fee":0},
+    {"id":"FER002","brand":"Ferrari","name":"Ferrari Cavallino Keyring","category":"Accessories","description":"Prancing Horse keyring with carbon fiber effect","price":48.00,"sizes":["Standard"],"colors":["Carbon/Yellow"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner Ferrari Birmingham":20},"special_order_fee":0},
+    {"id":"FER003","brand":"Ferrari","name":"Ferrari Racing Cap","category":"Apparel","description":"Official Scuderia Ferrari cap with team branding","price":55.00,"sizes":["One Size"],"colors":["Red","Black"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner Ferrari Birmingham":15},"special_order_fee":0},
+    {"id":"FER004","brand":"Ferrari","name":"Ferrari Model Collection","category":"Collectibles","description":"1:43 scale models, various Ferrari models available","price":125.00,"sizes":["1:43"],"colors":["Various"],"image":"🏎️","stock_type":"special_order","stock_levels":{},"special_order_fee":15.00},
+    {"id":"FER005","brand":"Ferrari","name":"Ferrari Leather Wallet","category":"Accessories","description":"Premium leather wallet with embossed Prancing Horse","price":85.00,"sizes":["Standard"],"colors":["Black","Red"],"image":"👛","stock_type":"special_order","stock_levels":{},"special_order_fee":7.00},
     
-    # Desk Items
-    {
-        "id": "MERCH012",
-        "name": "BMW Desktop Clock",
-        "category": "Desk Items",
-        "description": "Aluminum desk clock with BMW logo",
-        "price": 40.00,
-        "sizes": ["Standard"],
-        "colors": ["Silver"],
-        "image": "🕐",
-        "dealerships": ["Sytner BMW Solihull", "Sytner BMW Sheffield"],
-        "stock_levels": {"Sytner BMW Solihull": 8, "Sytner BMW Sheffield": 6}
-    },
-    {
-        "id": "MERCH013",
-        "name": "Leather Desk Mat",
-        "category": "Desk Items",
-        "description": "Premium leather with Sytner embossing",
-        "price": 45.00,
-        "sizes": ["Large"],
-        "colors": ["Black", "Brown"],
-        "image": "📋",
-        "dealerships": ["Sytner BMW Cardiff", "Sytner BMW Leicester", "Sytner BMW Nottingham"],
-        "stock_levels": {"Sytner BMW Cardiff": 10, "Sytner BMW Leicester": 12, "Sytner BMW Nottingham": 9}
-    },
+    # Lamborghini Merchandise
+    {"id":"LAMB001","brand":"Lamborghini","name":"Lamborghini Team Jacket","category":"Apparel","description":"Premium jacket with Raging Bull logo and racing details","price":145.00,"sizes":["S","M","L","XL"],"colors":["Black/Yellow","Black/Orange"],"image":"🧥","stock_type":"special_order","stock_levels":{},"special_order_fee":12.00},
+    {"id":"LAMB002","brand":"Lamborghini","name":"Lamborghini Carbon Keyring","category":"Accessories","description":"Real carbon fiber keyring with shield logo","price":65.00,"sizes":["Standard"],"colors":["Carbon Fiber"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner Lamborghini London":12},"special_order_fee":0},
+    {"id":"LAMB003","brand":"Lamborghini","name":"Lamborghini Travel Bag","category":"Bags","description":"Luxury weekend bag with leather details","price":195.00,"sizes":["Large"],"colors":["Black"],"image":"👜","stock_type":"special_order","stock_levels":{},"special_order_fee":15.00},
+    {"id":"LAMB004","brand":"Lamborghini","name":"Lamborghini Racing Cap","category":"Apparel","description":"Lamborghini Squadra Corse cap with hexagon pattern","price":58.00,"sizes":["One Size"],"colors":["Black/Yellow","Black/Green"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner Lamborghini London":8},"special_order_fee":0},
     
-    # Gifts
-    {
-        "id": "MERCH014",
-        "name": "BMW Model Car (1:43 Scale)",
-        "category": "Gifts",
-        "description": "Die-cast model, various models available",
-        "price": 65.00,
-        "sizes": ["1:43"],
-        "colors": ["Various Models"],
-        "image": "🏎️",
-        "dealerships": ["Sytner BMW Coventry", "Sytner BMW Solihull", "Sytner BMW Cardiff"],
-        "stock_levels": {"Sytner BMW Coventry": 15, "Sytner BMW Solihull": 20, "Sytner BMW Cardiff": 18}
-    },
-    {
-        "id": "MERCH015",
-        "name": "BMW Keyring Set",
-        "category": "Gifts",
-        "description": "Metal keyrings, premium gift box",
-        "price": 18.00,
-        "sizes": ["Standard"],
-        "colors": ["Silver", "Black", "Blue"],
-        "image": "🔑",
-        "dealerships": ["Sytner BMW Leicester", "Sytner BMW Nottingham", "Sytner BMW Sheffield", "Sytner BMW Newport"],
-        "stock_levels": {"Sytner BMW Leicester": 45, "Sytner BMW Nottingham": 40, "Sytner BMW Sheffield": 35, "Sytner BMW Newport": 38}
-    }
+    # Bentley Merchandise
+    {"id":"BENT001","brand":"Bentley","name":"Bentley Leather Wallet","category":"Accessories","description":"Hand-stitched leather wallet with Bentley 'B' emblem","price":95.00,"sizes":["Standard"],"colors":["Black","Tan"],"image":"👛","stock_type":"in_stock","stock_levels":{"Sytner Bentley Manchester":8},"special_order_fee":0},
+    {"id":"BENT002","brand":"Bentley","name":"Bentley Crystal Decanter","category":"Gifts","description":"Hand-cut crystal decanter with Bentley logo","price":185.00,"sizes":["750ml"],"colors":["Crystal"],"image":"🍷","stock_type":"special_order","stock_levels":{},"special_order_fee":15.00},
+    {"id":"BENT003","brand":"Bentley","name":"Bentley Cufflinks","category":"Accessories","description":"Sterling silver cufflinks with 'B' logo","price":125.00,"sizes":["Standard"],"colors":["Silver"],"image":"👔","stock_type":"special_order","stock_levels":{},"special_order_fee":8.00},
+    
+    # Rolls-Royce Merchandise
+    {"id":"RR001","brand":"Rolls-Royce","name":"Rolls-Royce Spirit Pen","category":"Stationery","description":"Luxury fountain pen with Spirit of Ecstasy detail","price":125.00,"sizes":["Standard"],"colors":["Black/Silver"],"image":"🖊️","stock_type":"in_stock","stock_levels":{"Sytner Rolls-Royce London":6},"special_order_fee":0},
+    {"id":"RR002","brand":"Rolls-Royce","name":"Rolls-Royce Leather Journal","category":"Stationery","description":"Hand-bound leather journal with RR monogram","price":85.00,"sizes":["A5"],"colors":["Black","Burgundy"],"image":"📓","stock_type":"special_order","stock_levels":{},"special_order_fee":10.00},
+    {"id":"RR003","brand":"Rolls-Royce","name":"Rolls-Royce Cufflinks","category":"Accessories","description":"Silver-plated cufflinks with Spirit of Ecstasy","price":150.00,"sizes":["Standard"],"colors":["Silver"],"image":"👔","stock_type":"special_order","stock_levels":{},"special_order_fee":10.00},
+    
+    # Aston Martin Merchandise
+    {"id":"AM001","brand":"Aston Martin","name":"Aston Martin Wings Keyring","category":"Accessories","description":"Enamel wings keyring in gift box","price":45.00,"sizes":["Standard"],"colors":["Silver/Green"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner Aston Martin Bristol":15},"special_order_fee":0},
+    {"id":"AM002","brand":"Aston Martin","name":"Aston Martin Polo Shirt","category":"Apparel","description":"Premium polo with embroidered wings logo","price":75.00,"sizes":["S","M","L","XL","XXL"],"colors":["Racing Green","Black","White"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner Aston Martin Bristol":12},"special_order_fee":0},
+    {"id":"AM003","brand":"Aston Martin","name":"Aston Martin Racing Jacket","category":"Apparel","description":"Team jacket with heritage racing details","price":135.00,"sizes":["S","M","L","XL","XXL"],"colors":["Racing Green"],"image":"🧥","stock_type":"special_order","stock_levels":{},"special_order_fee":12.00},
+    
+    # McLaren Merchandise
+    {"id":"MCL001","brand":"McLaren","name":"McLaren Racing Cap","category":"Apparel","description":"Official McLaren F1 team cap with papaya branding","price":48.00,"sizes":["One Size"],"colors":["Papaya/Blue","Black"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner McLaren Birmingham":18},"special_order_fee":0},
+    {"id":"MCL002","brand":"McLaren","name":"McLaren Carbon Keyring","category":"Accessories","description":"Genuine carbon fiber keyring with McLaren logo","price":55.00,"sizes":["Standard"],"colors":["Carbon Fiber"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner McLaren Birmingham":10},"special_order_fee":0},
+    {"id":"MCL003","brand":"McLaren","name":"McLaren Team Polo","category":"Apparel","description":"F1 team polo shirt with sponsor logos","price":68.00,"sizes":["S","M","L","XL","XXL"],"colors":["Papaya","Black"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner McLaren Birmingham":14},"special_order_fee":0},
+    
+    # Maserati Merchandise
+    {"id":"MAS001","brand":"Maserati","name":"Maserati Trident Keyring","category":"Accessories","description":"Enamel trident keyring with leather strap","price":42.00,"sizes":["Standard"],"colors":["Blue/Silver"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner Maserati Leeds":14},"special_order_fee":0},
+    {"id":"MAS002","brand":"Maserati","name":"Maserati Polo Shirt","category":"Apparel","description":"Premium cotton polo with embroidered trident","price":65.00,"sizes":["S","M","L","XL","XXL"],"colors":["Navy","Black","White"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner Maserati Leeds":10},"special_order_fee":0},
+    {"id":"MAS003","brand":"Maserati","name":"Maserati Leather Wallet","category":"Accessories","description":"Italian leather wallet with trident embossing","price":78.00,"sizes":["Standard"],"colors":["Black","Brown"],"image":"👛","stock_type":"special_order","stock_levels":{},"special_order_fee":6.00},
+    
+    # Jaguar Merchandise
+    {"id":"JAG001","brand":"Jaguar","name":"Jaguar Heritage Jacket","category":"Apparel","description":"Classic jacket with Jaguar leaper embroidery","price":95.00,"sizes":["S","M","L","XL","XXL"],"colors":["British Racing Green","Black"],"image":"🧥","stock_type":"in_stock","stock_levels":{"Sytner Jaguar Land Rover Coventry":8},"special_order_fee":0},
+    {"id":"JAG002","brand":"Jaguar","name":"Jaguar Leaper Keyring","category":"Accessories","description":"Chrome leaper keyring in presentation box","price":32.00,"sizes":["Standard"],"colors":["Chrome"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner Jaguar Land Rover Coventry":25},"special_order_fee":0},
+    {"id":"JAG003","brand":"Jaguar","name":"Jaguar Polo Shirt","category":"Apparel","description":"Performance polo with Jaguar branding","price":58.00,"sizes":["S","M","L","XL","XXL"],"colors":["Navy","White","Green"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner Jaguar Land Rover Coventry":16},"special_order_fee":0},
+    
+    # Land Rover Merchandise
+    {"id":"LR001","brand":"Land Rover","name":"Land Rover Travel Bag","category":"Bags","description":"Rugged canvas travel bag with leather straps","price":85.00,"sizes":["Large"],"colors":["Olive","Black"],"image":"🎒","stock_type":"in_stock","stock_levels":{"Sytner Jaguar Land Rover Coventry":6},"special_order_fee":0},
+    {"id":"LR002","brand":"Land Rover","name":"Land Rover Water Bottle","category":"Drinkware","description":"Insulated steel bottle with Land Rover logo, 750ml","price":22.00,"sizes":["750ml"],"colors":["Green","Black"],"image":"🧴","stock_type":"in_stock","stock_levels":{"Sytner Jaguar Land Rover Coventry":30},"special_order_fee":0},
+    {"id":"LR003","brand":"Land Rover","name":"Land Rover Heritage Cap","category":"Apparel","description":"Canvas cap with vintage Land Rover badge","price":28.00,"sizes":["One Size"],"colors":["Khaki","Navy"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner Jaguar Land Rover Coventry":22},"special_order_fee":0},
+    
+    # Volkswagen Merchandise
+    {"id":"VW001","brand":"Volkswagen","name":"VW GTI Polo Shirt","category":"Apparel","description":"GTI performance polo with plaid detailing","price":38.00,"sizes":["S","M","L","XL","XXL"],"colors":["Black","Red"],"image":"👕","stock_type":"in_stock","stock_levels":{"Sytner Volkswagen Oldbury":20},"special_order_fee":0},
+    {"id":"VW002","brand":"Volkswagen","name":"VW Logo Cap","category":"Apparel","description":"Classic VW cap with embroidered logo","price":24.00,"sizes":["One Size"],"colors":["Blue","Black"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner Volkswagen Oldbury":35},"special_order_fee":0},
+    {"id":"VW003","brand":"Volkswagen","name":"VW Travel Mug","category":"Drinkware","description":"Insulated mug with classic VW logo","price":18.00,"sizes":["400ml"],"colors":["Blue","White"],"image":"☕","stock_type":"in_stock","stock_levels":{"Sytner Volkswagen Oldbury":28},"special_order_fee":0},
+    
+    # MINI Merchandise
+    {"id":"MINI001","brand":"MINI","name":"MINI Cooper Cap","category":"Apparel","description":"Classic MINI cap with Union Jack detail","price":26.00,"sizes":["One Size"],"colors":["Black","Red"],"image":"🧢","stock_type":"in_stock","stock_levels":{"Sytner BMW Cardiff":28,"Sytner BMW Sheffield":22},"special_order_fee":0},
+    {"id":"MINI002","brand":"MINI","name":"MINI Keyring","category":"Accessories","description":"Chrome MINI logo keyring","price":16.00,"sizes":["Standard"],"colors":["Chrome"],"image":"🔑","stock_type":"in_stock","stock_levels":{"Sytner BMW Cardiff":40,"Sytner BMW Sheffield":35},"special_order_fee":0},
+    {"id":"MINI003","brand":"MINI","name":"MINI Cooper Tote Bag","category":"Bags","description":"Canvas tote with MINI Cooper heritage print","price":32.00,"sizes":["One Size"],"colors":["Black","Navy"],"image":"👜","stock_type":"in_stock","stock_levels":{"Sytner BMW Cardiff":12},"special_order_fee":0}
 ]
 
 # ============================================================================
-# SESSION STATE INITIALIZATION
+# SESSION STATE
 # ============================================================================
 
 if 'cart' not in st.session_state:
     st.session_state.cart = []
-
-if 'order_history' not in st.session_state:
-    st.session_state.order_history = []
+if 'selected_dealership' not in st.session_state:
+    st.session_state.selected_dealership = None
+if 'view_mode' not in st.session_state:
+    st.session_state.view_mode = "Grid"
+if 'show_cart' not in st.session_state:
+    st.session_state.show_cart = False
 
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
 
-def add_to_cart(item: Dict, dealership: str, size: str, color: str, quantity: int):
-    """Add item to shopping cart"""
-    cart_item = {
-        "item_id": item["id"],
-        "name": item["name"],
-        "category": item["category"],
-        "price": item["price"],
-        "dealership": dealership,
-        "size": size,
-        "color": color,
-        "quantity": quantity,
-        "subtotal": item["price"] * quantity,
-        "added_at": datetime.datetime.now()
-    }
-    st.session_state.cart.append(cart_item)
+def get_total_stock(item):
+    """Get total stock across all dealerships"""
+    return sum(item['stock_levels'].values())
+
+def get_available_dealerships(item):
+    """Get list of dealerships with stock"""
+    if item['stock_type'] == 'special_order':
+        return list(DEALERSHIPS.keys())  # Special orders available from any dealership
+    return list(item['stock_levels'].keys())
+
+def filter_catalog(brand=None, category=None, stock_filter=None, dealership=None, search_term=None, price_range=None):
+    """Filter merchandise based on criteria"""
+    filtered = MERCHANDISE_CATALOG.copy()
+    
+    if brand and brand != "All Brands":
+        filtered = [i for i in filtered if i['brand'] == brand]
+    
+    if category and category != "All Categories":
+        filtered = [i for i in filtered if i['category'] == category]
+    
+    if stock_filter == "In Stock Only":
+        filtered = [i for i in filtered if i['stock_type'] == 'in_stock' and len(i['stock_levels']) > 0]
+    elif stock_filter == "Special Order Only":
+        filtered = [i for i in filtered if i['stock_type'] == 'special_order']
+    
+    if dealership and dealership != "All Dealerships":
+        # Show items available at this dealership or special orders
+        filtered = [i for i in filtered if dealership in i['stock_levels'] or i['stock_type'] == 'special_order']
+    
+    if search_term:
+        search_lower = search_term.lower()
+        filtered = [i for i in filtered if 
+                   search_lower in i['name'].lower() or 
+                   search_lower in i['description'].lower() or
+                   search_lower in i['brand'].lower() or
+                   search_lower in i['category'].lower()]
+    
+    if price_range:
+        min_price, max_price = price_range
+        filtered = [i for i in filtered if min_price <= i['price'] <= max_price]
+    
+    return filtered
+
+def add_to_cart(item, dealership, quantity=1):
+    """Add item to cart"""
+    # Check if already in cart from this dealership
+    for cart_item in st.session_state.cart:
+        if cart_item['id'] == item['id'] and cart_item['dealership'] == dealership:
+            cart_item['quantity'] += quantity
+            cart_item['subtotal'] = cart_item['quantity'] * (item['price'] + item['special_order_fee'])
+            return True
+    
+    # Add new item
+    st.session_state.cart.append({
+        'id': item['id'],
+        'name': item['name'],
+        'brand': item['brand'],
+        'category': item['category'],
+        'price': item['price'],
+        'special_order': item['stock_type'] == 'special_order',
+        'special_order_fee': item['special_order_fee'],
+        'dealership': dealership,
+        'quantity': quantity,
+        'subtotal': quantity * (item['price'] + item['special_order_fee'])
+    })
     return True
-
-def remove_from_cart(index: int):
-    """Remove item from cart"""
-    if 0 <= index < len(st.session_state.cart):
-        st.session_state.cart.pop(index)
-        return True
-    return False
-
-def clear_cart():
-    """Clear all items from cart"""
-    st.session_state.cart = []
 
 def get_cart_total():
     """Calculate cart total"""
-    return sum(item["subtotal"] for item in st.session_state.cart)
+    return sum(item['subtotal'] for item in st.session_state.cart)
 
 def get_cart_count():
     """Get total items in cart"""
-    return sum(item["quantity"] for item in st.session_state.cart)
-
-def filter_merchandise(category=None, dealership=None, search_term=None, max_price=None):
-    """Filter merchandise based on criteria"""
-    results = MERCHANDISE_CATALOG.copy()
-    
-    if category and category != "All Categories":
-        results = [item for item in results if item["category"] == category]
-    
-    if dealership and dealership != "All Dealerships":
-        results = [item for item in results if dealership in item["dealerships"]]
-    
-    if search_term:
-        search_term = search_term.lower()
-        results = [item for item in results if 
-                   search_term in item["name"].lower() or 
-                   search_term in item["description"].lower() or
-                   search_term in item["category"].lower()]
-    
-    if max_price:
-        results = [item for item in results if item["price"] <= max_price]
-    
-    return results
+    return sum(item['quantity'] for item in st.session_state.cart)
 
 # ============================================================================
 # MAIN APP
 # ============================================================================
 
-def main():
-    # Header
-    st.markdown(f"""
-    <div style='background: linear-gradient(135deg, {PRIMARY} 0%, {ACCENT} 100%); 
-                padding: 32px 24px; border-radius: 16px; margin-bottom: 24px; text-align: center;'>
-        <h1 style='color: white; margin: 0 0 12px 0; font-size: 40px; font-weight: 900;'>🛍️ Sytner Merchandise Locator</h1>
-        <p style='color: white; font-size: 18px; margin: 0; opacity: 0.95;'>Head Office Exclusive Access</p>
-        <p style='color: white; font-size: 14px; margin: 8px 0 0 0; opacity: 0.85;'>Browse and order merchandise from any Sytner dealership</p>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Sidebar - Cart & Filters
-    with st.sidebar:
-        st.markdown(f"### 🛒 Shopping Cart")
-        cart_count = get_cart_count()
-        cart_total = get_cart_total()
-        
-        if cart_count > 0:
-            st.markdown(f"""
-            <div style='background-color: {SUCCESS}; color: white; padding: 16px; border-radius: 8px; text-align: center; margin-bottom: 16px;'>
-                <div style='font-size: 28px; font-weight: 700;'>{cart_count}</div>
-                <div style='font-size: 12px; opacity: 0.9;'>Items in Cart</div>
-                <div style='font-size: 20px; font-weight: 700; margin-top: 8px;'>£{cart_total:.2f}</div>
-            </div>
-            """, unsafe_allow_html=True)
-            
-            if st.button("🛍️ View Cart & Checkout", use_container_width=True, type="primary"):
-                st.session_state.show_cart = True
-        else:
-            st.info("Your cart is empty")
-        
-        st.markdown("---")
-        st.markdown("### 🔍 Filters")
-        
-        # Category filter
-        categories = ["All Categories"] + sorted(list(set(item["category"] for item in MERCHANDISE_CATALOG)))
-        category_filter = st.selectbox("Category", categories, key="category_filter")
-        
-        # Dealership filter
-        dealership_options = ["All Dealerships"] + sorted(list(DEALERSHIPS.keys()))
-        dealership_filter = st.selectbox("Dealership", dealership_options, key="dealership_filter")
-        
-        # Price filter
-        max_price = st.slider("Max Price (£)", 0, 100, 100, 5, key="price_filter")
-        
-        # Search
-        search_term = st.text_input("🔎 Search products", placeholder="e.g. polo shirt", key="search_filter")
-        
-        if st.button("Clear Filters", use_container_width=True):
-            st.session_state.category_filter = "All Categories"
-            st.session_state.dealership_filter = "All Dealerships"
-            st.session_state.price_filter = 100
-            st.session_state.search_filter = ""
-            st.rerun()
-    
-    # Main content
-    if st.session_state.get('show_cart', False):
-        render_cart_page()
-    else:
-        render_catalog_page(category_filter, dealership_filter, search_term, max_price)
+# Header
+st.markdown(f"""
+<div style='background: linear-gradient(180deg, {PRIMARY} 0%, {SECONDARY} 100%); 
+            padding: 40px 24px; border-bottom: 3px solid {ACCENT}; text-align: center;'>
+    <h1 style='color: white; margin: 0 0 16px 0; font-size: 48px; font-weight: 300; letter-spacing: 2px;'>THE MERCH HUB</h1>
+    <p style='color: white; font-size: 16px; margin: 0; opacity: 0.9; font-weight: 300;'>Sytner Head Office Exclusive</p>
+    <p style='color: white; font-size: 13px; margin: 8px 0 0 0; opacity: 0.75; font-weight: 300;'>Browse and collect premium merchandise from any Sytner dealership</p>
+</div>
+""", unsafe_allow_html=True)
 
-def render_catalog_page(category, dealership, search, max_price):
-    """Render the main merchandise catalog"""
+# Sidebar
+with st.sidebar:
+    st.markdown("### 🏪 COLLECTION LOCATION")
     
-    # Get filtered results
-    filtered_items = filter_merchandise(category, dealership, search, max_price)
+    selected_dealership = st.selectbox(
+        "Filter by dealership",
+        ["All Dealerships"] + sorted(DEALERSHIPS.keys()),
+        key="dealership_selector"
+    )
     
-    # Results summary
-    col1, col2, col3 = st.columns([2, 1, 1])
-    with col1:
-        st.markdown(f"### 📦 Available Merchandise")
-        st.markdown(f"*Showing {len(filtered_items)} of {len(MERCHANDISE_CATALOG)} products*")
-    with col2:
-        sort_by = st.selectbox("Sort by", ["Name A-Z", "Price Low-High", "Price High-Low", "Category"], label_visibility="collapsed")
-    with col3:
-        view_mode = st.radio("View", ["Grid", "List"], horizontal=True, label_visibility="collapsed")
-    
-    # Sort results
-    if sort_by == "Price Low-High":
-        filtered_items = sorted(filtered_items, key=lambda x: x["price"])
-    elif sort_by == "Price High-Low":
-        filtered_items = sorted(filtered_items, key=lambda x: x["price"], reverse=True)
-    elif sort_by == "Category":
-        filtered_items = sorted(filtered_items, key=lambda x: x["category"])
-    else:  # Name A-Z
-        filtered_items = sorted(filtered_items, key=lambda x: x["name"])
-    
-    if not filtered_items:
-        st.warning("No products found matching your filters. Try adjusting your search criteria.")
-        return
-    
-    # Display items
-    if view_mode == "Grid":
-        render_grid_view(filtered_items)
-    else:
-        render_list_view(filtered_items)
-
-def render_grid_view(items):
-    """Render products in grid layout"""
-    cols_per_row = 3
-    
-    for i in range(0, len(items), cols_per_row):
-        cols = st.columns(cols_per_row)
-        for j, col in enumerate(cols):
-            if i + j < len(items):
-                item = items[i + j]
-                with col:
-                    render_product_card(item)
-
-def render_product_card(item):
-    """Render individual product card"""
-    # Available dealerships count
-    dealership_count = len(item["dealerships"])
-    total_stock = sum(item["stock_levels"].values())
-    
-    # Card container
-    st.markdown(f"""
-    <div style='background-color: white; padding: 20px; border-radius: 12px; 
-                border: 2px solid #e2e8f0; margin-bottom: 20px; height: 100%;'>
-        <div style='font-size: 48px; text-align: center; margin-bottom: 12px;'>{item["image"]}</div>
-        <h4 style='color: {PRIMARY}; margin: 0 0 8px 0; font-size: 16px;'>{item["name"]}</h4>
-        <p style='color: #64748b; font-size: 13px; margin: 0 0 12px 0; min-height: 40px;'>{item["description"]}</p>
-        <div style='background-color: #f8fafc; padding: 8px; border-radius: 6px; margin-bottom: 12px;'>
-            <div style='font-size: 24px; font-weight: 700; color: {PRIMARY};'>£{item["price"]:.2f}</div>
-            <div style='font-size: 11px; color: #64748b;'>{item["category"]}</div>
-        </div>
-        <div style='display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;'>
-            <span style='font-size: 12px; color: #64748b;'>📍 {dealership_count} locations</span>
-            <span style='font-size: 12px; color: {"#22c55e" if total_stock > 20 else "#ef4444"};'>
-                ● {total_stock} in stock
-            </span>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    # Add to cart button
-    if st.button(f"🛒 Add to Cart", key=f"add_{item['id']}", use_container_width=True, type="primary"):
-        st.session_state.selected_item = item
-        st.rerun()
-    
-    # View details button
-    if st.button(f"👁️ View Details", key=f"view_{item['id']}", use_container_width=True):
-        show_product_detail_modal(item)
-
-def show_product_detail_modal(item):
-    """Show detailed product information in a modal"""
-    st.markdown(f"""
-    <div style='background-color: white; padding: 24px; border-radius: 12px; border: 2px solid {PRIMARY};'>
-        <div style='display: flex; align-items: center; margin-bottom: 20px;'>
-            <div style='font-size: 60px; margin-right: 20px;'>{item["image"]}</div>
-            <div>
-                <h2 style='color: {PRIMARY}; margin: 0 0 8px 0;'>{item["name"]}</h2>
-                <p style='color: #64748b; margin: 0; font-size: 16px;'>{item["description"]}</p>
-            </div>
-        </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown(f"**Price:** £{item['price']:.2f}")
-        st.markdown(f"**Category:** {item['category']}")
-        st.markdown(f"**Product ID:** {item['id']}")
-        
-        st.markdown("**Available Sizes:**")
-        st.markdown(" • " + " • ".join(item["sizes"]))
-        
-        st.markdown("**Available Colors:**")
-        st.markdown(" • " + " • ".join(item["colors"]))
-    
-    with col2:
-        st.markdown("**📍 Available At:**")
-        for dealership in item["dealerships"]:
-            stock = item["stock_levels"][dealership]
-            stock_color = "#22c55e" if stock > 20 else "#f59e0b" if stock > 10 else "#ef4444"
-            st.markdown(f"""
-            <div style='background-color: #f8fafc; padding: 8px 12px; border-radius: 6px; margin-bottom: 6px;'>
-                <div style='font-weight: 600; color: {PRIMARY};'>{dealership}</div>
-                <div style='font-size: 12px; color: {stock_color};'>● {stock} in stock</div>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    
-    # Add to cart section
-    st.markdown("---")
-    st.markdown("### 🛒 Add to Cart")
-    
-    col_a, col_b, col_c, col_d = st.columns(4)
-    with col_a:
-        selected_dealership = st.selectbox("Dealership", item["dealerships"], key=f"modal_dealership_{item['id']}")
-    with col_b:
-        selected_size = st.selectbox("Size", item["sizes"], key=f"modal_size_{item['id']}")
-    with col_c:
-        selected_color = st.selectbox("Color", item["colors"], key=f"modal_color_{item['id']}")
-    with col_d:
-        quantity = st.number_input("Quantity", 1, 10, 1, key=f"modal_qty_{item['id']}")
-    
-    if st.button("Add to Cart", type="primary", use_container_width=True, key=f"modal_add_{item['id']}"):
-        add_to_cart(item, selected_dealership, selected_size, selected_color, quantity)
-        st.success(f"✅ Added {quantity}x {item['name']} to cart!")
-        st.balloons()
-
-def render_list_view(items):
-    """Render products in list layout"""
-    for item in items:
-        render_product_list_item(item)
-
-def render_product_list_item(item):
-    """Render product as list item"""
-    dealership_count = len(item["dealerships"])
-    total_stock = sum(item["stock_levels"].values())
-    
-    col1, col2 = st.columns([3, 1])
-    
-    with col1:
+    if selected_dealership != "All Dealerships":
+        st.session_state.selected_dealership = selected_dealership
+        dealership_info = DEALERSHIPS[selected_dealership]
         st.markdown(f"""
-        <div style='background-color: white; padding: 20px; border-radius: 12px; border: 2px solid #e2e8f0; margin-bottom: 16px;'>
-            <div style='display: flex; align-items: center;'>
-                <div style='font-size: 48px; margin-right: 20px;'>{item["image"]}</div>
-                <div style='flex: 1;'>
-                    <h4 style='color: {PRIMARY}; margin: 0 0 8px 0;'>{item["name"]}</h4>
-                    <p style='color: #64748b; font-size: 14px; margin: 0 0 12px 0;'>{item["description"]}</p>
-                    <div style='display: flex; gap: 20px; align-items: center;'>
-                        <span style='font-size: 24px; font-weight: 700; color: {PRIMARY};'>£{item["price"]:.2f}</span>
-                        <span style='font-size: 12px; color: #64748b;'>Category: {item["category"]}</span>
-                        <span style='font-size: 12px; color: #64748b;'>📍 {dealership_count} locations</span>
-                        <span style='font-size: 12px; color: {"#22c55e" if total_stock > 20 else "#ef4444"};'>
-                            ● {total_stock} in stock
-                        </span>
-                    </div>
-                </div>
-            </div>
+        <div style='background: {LIGHT_GREY}; padding: 12px; border-left: 3px solid {PRIMARY}; margin: 8px 0;'>
+            <div style='font-size: 10px; color: {ACCENT}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;'>Region</div>
+            <div style='font-size: 13px; color: {PRIMARY}; font-weight: 500; margin-bottom: 8px;'>{dealership_info['region']}</div>
+            <div style='font-size: 10px; color: {ACCENT}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;'>Available Brands</div>
+            <div style='font-size: 12px; color: {PRIMARY};'>{' • '.join(dealership_info['brands'])}</div>
         </div>
         """, unsafe_allow_html=True)
+    else:
+        st.session_state.selected_dealership = None
     
-    with col2:
+    st.markdown("---")
+    st.markdown("### 🛒 YOUR ORDER")
+    
+    cart_count = get_cart_count()
+    cart_total = get_cart_total()
+    
+    if cart_count > 0:
+        st.markdown(f"""
+        <div style='background: {PRIMARY}; color: white; padding: 20px; text-align: center;'>
+            <div style='font-size: 36px; font-weight: 300; margin-bottom: 4px;'>{cart_count}</div>
+            <div style='font-size: 10px; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;'>Items in Order</div>
+            <div style='font-size: 28px; font-weight: 300;'>£{cart_total:.2f}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("🛒 Add", key=f"list_add_{item['id']}", use_container_width=True, type="primary"):
-            st.session_state.selected_item = item
+        
+        if st.button("VIEW ORDER", use_container_width=True, type="primary"):
+            st.session_state.show_cart = True
             st.rerun()
-        if st.button("👁️ Details", key=f"list_view_{item['id']}", use_container_width=True):
-            show_product_detail_modal(item)
-
-def render_cart_page():
-    """Render shopping cart and checkout"""
-    st.markdown("### 🛒 Your Shopping Cart")
+    else:
+        st.info("Your order is empty")
     
-    if st.button("← Back to Catalog", type="secondary"):
-        st.session_state.show_cart = False
+    st.markdown("---")
+    st.markdown("### 🔍 FILTERS")
+    
+    # Brand filter
+    brands = ["All Brands"] + sorted(list(set(item['brand'] for item in MERCHANDISE_CATALOG)))
+    brand_filter = st.selectbox("Brand", brands)
+    
+    # Category filter
+    categories = ["All Categories"] + sorted(list(set(item['category'] for item in MERCHANDISE_CATALOG)))
+    category_filter = st.selectbox("Category", categories)
+    
+    # Stock availability
+    stock_filter = st.radio("Availability", ["All Items", "In Stock Only", "Special Order Only"])
+    
+    # Price range
+    st.markdown("**Price Range**")
+    price_range = st.slider("", 0, 200, (0, 200), 10, label_visibility="collapsed")
+    
+    # Search
+    search_term = st.text_input("🔎 Search", placeholder="Search products...")
+    
+    if st.button("CLEAR FILTERS", use_container_width=True):
+        st.session_state.dealership_selector = "All Dealerships"
         st.rerun()
+
+# Main content area
+if st.session_state.show_cart:
+    # CART PAGE
+    st.markdown("### 🛒 YOUR COLLECTION ORDER")
+    
+    col_back, col_space = st.columns([1, 3])
+    with col_back:
+        if st.button("← BACK TO CATALOG"):
+            st.session_state.show_cart = False
+            st.rerun()
     
     st.markdown("---")
     
     if not st.session_state.cart:
-        st.info("Your cart is empty. Browse the catalog to add items!")
-        return
-    
-    # Cart items
-    for idx, cart_item in enumerate(st.session_state.cart):
-        col1, col2 = st.columns([4, 1])
+        st.info("Your order is empty. Browse the catalog to add items.")
+    else:
+        # Display cart items
+        for idx, cart_item in enumerate(st.session_state.cart):
+            col1, col2 = st.columns([4, 1])
+            
+            with col1:
+                special_badge = ""
+                if cart_item['special_order']:
+                    special_badge = f"<span style='background: #ff9800; color: white; padding: 3px 8px; font-size: 10px; border-radius: 0; margin-left: 12px; text-transform: uppercase; letter-spacing: 0.5px;'>Special Order +£{cart_item['special_order_fee']:.0f}</span>"
+                
+                st.markdown(f"""
+                <div style='background: white; padding: 20px; border: 1px solid {BORDER}; margin-bottom: 16px;'>
+                    <div style='display: flex; justify-content: space-between; align-items: start;'>
+                        <div style='flex: 1;'>
+                            <h4 style='margin: 0 0 8px 0; color: {PRIMARY}; font-size: 16px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;'>
+                                {cart_item['name']}{special_badge}
+                            </h4>
+                            <div style='font-size: 12px; color: {ACCENT}; margin-bottom: 4px;'>
+                                <strong>Brand:</strong> {cart_item['brand']} • <strong>Category:</strong> {cart_item['category']}
+                            </div>
+                            <div style='font-size: 12px; color: {ACCENT}; margin-top: 8px; padding-top: 8px; border-top: 1px solid {BORDER};'>
+                                📍 <strong>Collection from:</strong> {cart_item['dealership']}
+                            </div>
+                            <div style='font-size: 12px; color: {ACCENT}; margin-top: 4px;'>
+                                <strong>Quantity:</strong> {cart_item['quantity']}
+                            </div>
+                        </div>
+                        <div style='text-align: right; margin-left: 24px;'>
+                            <div style='font-size: 24px; font-weight: 300; color: {PRIMARY};'>£{cart_item['subtotal']:.2f}</div>
+                            <div style='font-size: 11px; color: {ACCENT}; margin-top: 4px;'>£{cart_item['price']:.2f} each</div>
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with col2:
+                st.markdown("<br><br>", unsafe_allow_html=True)
+                if st.button("REMOVE", key=f"remove_{idx}", use_container_width=True):
+                    st.session_state.cart.pop(idx)
+                    st.rerun()
         
-        with col1:
+        # Order summary
+        st.markdown("---")
+        
+        col_summary, col_total = st.columns([2, 1])
+        
+        with col_total:
             st.markdown(f"""
-            <div style='background-color: white; padding: 16px; border-radius: 8px; border: 2px solid #e2e8f0; margin-bottom: 12px;'>
-                <div style='display: flex; justify-content: space-between; align-items: center;'>
-                    <div>
-                        <h4 style='color: {PRIMARY}; margin: 0 0 8px 0;'>{cart_item["name"]}</h4>
-                        <p style='color: #64748b; font-size: 13px; margin: 0;'>
-                            From: {cart_item["dealership"]}<br>
-                            Size: {cart_item["size"]} • Color: {cart_item["color"]} • Qty: {cart_item["quantity"]}
-                        </p>
-                    </div>
-                    <div style='text-align: right;'>
-                        <div style='font-size: 20px; font-weight: 700; color: {PRIMARY};'>£{cart_item["subtotal"]:.2f}</div>
-                        <div style='font-size: 12px; color: #64748b;'>£{cart_item["price"]:.2f} each</div>
-                    </div>
+            <div style='background: {PRIMARY}; color: white; padding: 24px; border-radius: 0;'>
+                <h3 style='margin: 0 0 20px 0; font-weight: 300; letter-spacing: 1px; text-transform: uppercase; font-size: 14px;'>
+                    ORDER SUMMARY
+                </h3>
+                <div style='display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 300;'>
+                    <span>Subtotal:</span>
+                    <span>£{cart_total:.2f}</span>
+                </div>
+                <div style='display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 14px; font-weight: 300;'>
+                    <span>Collection:</span>
+                    <span style='color: {SUCCESS};'>FREE</span>
+                </div>
+                <hr style='border: 1px solid rgba(255,255,255,0.2); margin: 16px 0;'>
+                <div style='display: flex; justify-content: space-between; font-size: 20px; font-weight: 300;'>
+                    <span>Total:</span>
+                    <span>£{cart_total:.2f}</span>
                 </div>
             </div>
             """, unsafe_allow_html=True)
-        
-        with col2:
+            
             st.markdown("<br>", unsafe_allow_html=True)
-            if st.button("🗑️ Remove", key=f"remove_{idx}", use_container_width=True):
-                remove_from_cart(idx)
+            
+            if st.button("PLACE ORDER", type="primary", use_container_width=True):
+                st.session_state.checkout_mode = True
                 st.rerun()
-    
-    # Cart summary
-    st.markdown("---")
-    cart_total = get_cart_total()
-    
-    col1, col2 = st.columns([2, 1])
-    
-    with col2:
-        st.markdown(f"""
-        <div style='background-color: {PRIMARY}; color: white; padding: 20px; border-radius: 12px;'>
-            <h3 style='margin: 0 0 16px 0;'>Order Summary</h3>
-            <div style='display: flex; justify-content: space-between; margin-bottom: 8px;'>
-                <span>Subtotal:</span>
-                <span style='font-weight: 700;'>£{cart_total:.2f}</span>
-            </div>
-            <div style='display: flex; justify-content: space-between; margin-bottom: 8px;'>
-                <span>Shipping:</span>
-                <span style='font-weight: 700;'>FREE</span>
-            </div>
-            <hr style='border: 1px solid rgba(255,255,255,0.2); margin: 12px 0;'>
-            <div style='display: flex; justify-content: space-between; font-size: 20px; font-weight: 900;'>
-                <span>Total:</span>
-                <span>£{cart_total:.2f}</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
         
-        st.markdown("<br>", unsafe_allow_html=True)
+        with col_summary:
+            if st.button("🗑️ CLEAR ORDER", use_container_width=True):
+                st.session_state.cart = []
+                st.rerun()
         
-        if st.button("✅ Place Order", type="primary", use_container_width=True):
-            st.session_state.checkout_mode = True
-            st.rerun()
-    
-    with col1:
-        if st.button("🗑️ Clear Cart", use_container_width=True):
-            clear_cart()
-            st.rerun()
-    
-    # Checkout form
-    if st.session_state.get('checkout_mode', False):
-        st.markdown("---")
-        st.markdown("### 📝 Delivery Details")
-        
-        with st.form("checkout_form"):
-            col_a, col_b = st.columns(2)
-            with col_a:
-                name = st.text_input("Full Name *", placeholder="John Smith")
-                email = st.text_input("Email *", placeholder="john.smith@sytner.co.uk")
-                department = st.text_input("Department *", placeholder="Marketing")
-            with col_b:
-                phone = st.text_input("Phone Number *", placeholder="07700 900000")
-                office_location = st.selectbox("Office Location *", [
-                    "Sytner Head Office - Leicester",
-                    "Sytner Head Office - Nottingham",
-                    "Sytner Regional Office - Birmingham"
-                ])
-                delivery_preference = st.radio("Delivery", ["Office Delivery", "Collect from Dealership"], horizontal=True)
+        # Checkout form
+        if st.session_state.get('checkout_mode'):
+            st.markdown("---")
+            st.markdown("### 📝 YOUR DETAILS")
             
-            notes = st.text_area("Special Instructions (optional)", placeholder="Any specific delivery requirements...")
-            
-            col_submit, col_cancel = st.columns(2)
-            with col_submit:
-                submitted = st.form_submit_button("🎉 Confirm Order", type="primary", use_container_width=True)
-            with col_cancel:
-                cancelled = st.form_submit_button("❌ Cancel", use_container_width=True)
-            
-            if submitted:
-                if name and email and department and phone:
-                    # Create order
-                    order_ref = f"ORD-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
-                    order = {
-                        "order_ref": order_ref,
-                        "items": st.session_state.cart.copy(),
-                        "total": cart_total,
-                        "customer": {
-                            "name": name,
-                            "email": email,
-                            "department": department,
-                            "phone": phone,
-                            "office": office_location,
-                            "delivery": delivery_preference
-                        },
-                        "notes": notes,
-                        "order_date": datetime.datetime.now(),
-                        "status": "Processing"
-                    }
-                    
-                    st.session_state.order_history.append(order)
-                    clear_cart()
+            with st.form("checkout_form"):
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    name = st.text_input("Full Name *", placeholder="John Smith")
+                    email = st.text_input("Email Address *", placeholder="john.smith@sytner.co.uk")
+                with col_b:
+                    phone = st.text_input("Phone Number *", placeholder="07700 900000")
+                    department = st.text_input("Department *", placeholder="e.g. Marketing, Finance")
+                
+                notes = st.text_area("Special Instructions (optional)", placeholder="Any specific requirements...")
+                
+                st.markdown(f"""
+                <div style='background: {LIGHT_GREY}; padding: 16px; border-left: 3px solid {PRIMARY}; margin: 16px 0;'>
+                    <div style='font-size: 12px; color: {ACCENT};'>
+                        <strong>Collection Policy:</strong> You'll receive email notifications when each item is ready for collection
+                        at the designated dealership. In-stock items: 2-3 working days. Special orders: 5-7 working days.
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+                
+                col_submit, col_cancel = st.columns(2)
+                with col_submit:
+                    submitted = st.form_submit_button("✅ CONFIRM ORDER", type="primary", use_container_width=True)
+                with col_cancel:
+                    cancelled = st.form_submit_button("❌ CANCEL", use_container_width=True)
+                
+                if submitted:
+                    if name and email and phone and department:
+                        order_ref = f"MERCH-{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+                        
+                        # Group items by dealership
+                        dealerships_in_order = {}
+                        for item in st.session_state.cart:
+                            dealer = item['dealership']
+                            if dealer not in dealerships_in_order:
+                                dealerships_in_order[dealer] = []
+                            dealerships_in_order[dealer].append(item['name'])
+                        
+                        collection_summary = "\n".join([f"**{dealer}:** {', '.join(items)}" 
+                                                       for dealer, items in dealerships_in_order.items()])
+                        
+                        st.success(f"""
+                        ✅ **ORDER PLACED SUCCESSFULLY**
+                        
+                        **Order Reference:** {order_ref}  
+                        **Total:** £{cart_total:.2f}  
+                        **Items:** {cart_count}  
+                        
+                        **Collection Points:**  
+                        {collection_summary}
+                        
+                        📧 **Confirmation sent to:** {email}  
+                        ⏱️ **Collection Timeline:**  
+                        - In-stock items: 2-3 working days  
+                        - Special orders: 5-7 working days
+                        
+                        You'll receive individual collection notifications for each dealership.
+                        """)
+                        st.balloons()
+                        
+                        # Clear cart
+                        st.session_state.cart = []
+                        st.session_state.checkout_mode = False
+                        st.session_state.show_cart = False
+                    else:
+                        st.error("⚠️ Please fill in all required fields")
+                
+                if cancelled:
                     st.session_state.checkout_mode = False
-                    st.session_state.show_cart = False
-                    
-                    st.success(f"""
-                    🎉 **Order Placed Successfully!**
-                    
-                    **Order Reference:** {order_ref}  
-                    **Total:** £{cart_total:.2f}  
-                    **Delivery To:** {office_location}  
-                    
-                    📧 Confirmation email sent to: {email}  
-                    ⏱️ **Estimated Delivery:** 3-5 working days
-                    
-                    You can track your order status in the Order History section.
-                    """)
-                    st.balloons()
                     st.rerun()
-                else:
-                    st.error("⚠️ Please fill in all required fields")
-            
-            if cancelled:
-                st.session_state.checkout_mode = False
-                st.rerun()
 
-# Check if item was selected for adding to cart
-if st.session_state.get('selected_item'):
-    item = st.session_state.selected_item
+else:
+    # CATALOG PAGE
     
-    st.markdown(f"### 🛒 Add {item['name']} to Cart")
+    # Filter catalog
+    filtered_catalog = filter_catalog(
+        brand=brand_filter if brand_filter != "All Brands" else None,
+        category=category_filter if category_filter != "All Categories" else None,
+        stock_filter=stock_filter if stock_filter != "All Items" else None,
+        dealership=st.session_state.selected_dealership,
+        search_term=search_term if search_term else None,
+        price_range=price_range if price_range != (0, 200) else None
+    )
     
-    col1, col2, col3, col4 = st.columns(4)
+    # Results header
+    col1, col2, col3 = st.columns([2, 1, 1])
+    
     with col1:
-        selected_dealership = st.selectbox("Select Dealership", item["dealerships"], key="add_dealership")
-    with col2:
-        selected_size = st.selectbox("Select Size", item["sizes"], key="add_size")
-    with col3:
-        selected_color = st.selectbox("Select Color", item["colors"], key="add_color")
-    with col4:
-        quantity = st.number_input("Quantity", 1, 10, 1, key="add_quantity")
+        st.markdown("### 📦 AVAILABLE MERCHANDISE")
+        st.markdown(f"*Showing {len(filtered_catalog)} of {len(MERCHANDISE_CATALOG)} items*")
     
-    col_a, col_b = st.columns(2)
-    with col_a:
-        if st.button("✅ Add to Cart", type="primary", use_container_width=True):
-            add_to_cart(item, selected_dealership, selected_size, selected_color, quantity)
-            st.success(f"✅ Added {quantity}x {item['name']} to cart!")
-            del st.session_state.selected_item
-            st.balloons()
-            st.rerun()
-    with col_b:
-        if st.button("❌ Cancel", use_container_width=True):
-            del st.session_state.selected_item
-            st.rerun()
+    with col2:
+        sort_by = st.selectbox(
+            "Sort by",
+            ["Name A-Z", "Price Low-High", "Price High-Low", "Brand", "Category"],
+            label_visibility="collapsed"
+        )
+    
+    with col3:
+        view_mode = st.radio(
+            "View",
+            ["Grid", "List"],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
+    
+    # Sort results
+    if sort_by == "Price Low-High":
+        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['price'])
+    elif sort_by == "Price High-Low":
+        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['price'], reverse=True)
+    elif sort_by == "Brand":
+        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['brand'])
+    elif sort_by == "Category":
+        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['category'])
+    else:  # Name A-Z
+        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['name'])
     
     st.markdown("---")
-
-if __name__ == "__main__":
-    main()
+    
+    if not filtered_catalog:
+        st.warning("No products found matching your filters. Try adjusting your search criteria.")
+    else:
+        if view_mode == "Grid":
+            # Grid view - 4 columns
+            cols_per_row = 4
+            for i in range(0, len(filtered_catalog), cols_per_row):
+                cols = st.columns(cols_per_row)
+                for j, col in enumerate(cols):
+                    if i + j < len(filtered_catalog):
+                        item = filtered_catalog[i + j]
+                        with col:
+                            # Availability status
+                            if item['stock_type'] == 'special_order':
+                                avail_color = "#ff9800"
+                                avail_text = f"⚠️ Special Order +£{item['special_order_fee']}"
+                                total_stock = "N/A"
+                            else:
+                                total_stock = get_total_stock(item)
+                                if total_stock > 20:
+                                    avail_color = SUCCESS
+                                    avail_text = f"✓ {total_stock} in stock"
+                                elif total_stock > 0:
+                                    avail_color = "#ff9800"
+                                    avail_text = f"⚠️ {total_stock} in stock"
+                                else:
+                                    continue  # Skip items with no stock
+                            
+                            # Product card
+                            st.markdown(f"""
+                            <div style='background: white; padding: 20px; border: 1px solid {BORDER}; margin-bottom: 20px; min-height: 380px;'>
+                                <div style='font-size: 48px; text-align: center; margin-bottom: 16px;'>{item['image']}</div>
+                                <h4 style='color: {PRIMARY}; margin: 0 0 8px 0; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; min-height: 40px;'>
+                                    {item['name']}
+                                </h4>
+                                <p style='color: {ACCENT}; font-size: 11px; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.3px;'>
+                                    {item['brand']} • {item['category']}
+                                </p>
+                                <div style='background: {LIGHT_GREY}; padding: 10px; margin-bottom: 12px;'>
+                                    <div style='font-size: 22px; font-weight: 300; color: {PRIMARY};'>£{item['price']:.2f}</div>
+                                </div>
+                                <div style='font-size: 11px; color: {avail_color}; font-weight: 500; padding-top: 8px; border-top: 1px solid {BORDER};'>
+                                    {avail_text}
+                                </div>
+                            </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Add to cart button
+                            available_dealerships = get_available_dealerships(item)
+                            
+                            if len(available_dealerships) == 1:
+                                # Only one location - direct add button
+                                if st.button("ADD TO ORDER", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
+                                    add_to_cart(item, available_dealerships[0])
+                                    st.success("✅ Added to order!")
+                                    st.rerun()
+                            else:
+                                # Multiple locations - show selector
+                                selected_loc = st.selectbox(
+                                    "Collection from",
+                                    available_dealerships,
+                                    key=f"loc_grid_{item['id']}",
+                                    label_visibility="collapsed"
+                                )
+                                if st.button("ADD", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
+                                    add_to_cart(item, selected_loc)
+                                    st.success("✅ Added to order!")
+                                    st.rerun()
+        
+        else:
+            # List view
+            for item in filtered_catalog:
+                col1, col2 = st.columns([3, 1])
+                
+                with col1:
+                    # Availability
+                    if item['stock_type'] == 'special_order':
+                        avail_badge = f"<span style='background:#ff9800; color:white; padding:3px 8px; font-size:10px; border-radius:0; text-transform:uppercase;'>Special Order +£{item['special_order_fee']}</span>"
+                        locations_text = "Available from any dealership"
+                    else:
+                        total_stock = get_total_stock(item)
+                        if total_stock == 0:
+                            continue
+                        avail_badge = f"<span style='background:{SUCCESS}; color:white; padding:3px 8px; font-size:10px; border-radius:0; text-transform:uppercase;'>✓ {total_stock} in Stock</span>"
+                        locations = ', '.join(item['stock_levels'].keys())
+                        locations_text = f"Available at: {locations}"
+                    
+                    st.markdown(f"""
+                    <div style='background: white; padding: 20px; border: 1px solid {BORDER}; margin-bottom: 16px;'>
+                        <div style='display: flex; align-items: start;'>
+                            <div style='font-size: 48px; margin-right: 20px;'>{item['image']}</div>
+                            <div style='flex: 1;'>
+                                <h4 style='color: {PRIMARY}; margin: 0 0 8px 0; font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;'>
+                                    {item['name']} {avail_badge}
+                                </h4>
+                                <p style='color: {ACCENT}; font-size: 13px; margin: 0 0 12px 0; line-height: 1.6;'>
+                                    {item['description']}
+                                </p>
+                                <div style='display: flex; gap: 20px; align-items: center; font-size: 12px; color: {ACCENT};'>
+                                    <span><strong>Brand:</strong> {item['brand']}</span>
+                                    <span><strong>Category:</strong> {item['category']}</span>
+                                    <span><strong>Price:</strong> <span style='font-size:18px; color:{PRIMARY}; font-weight:300;'>£{item['price']:.2f}</span></span>
+                                </div>
+                                <div style='font-size: 11px; color: {ACCENT}; margin-top: 8px; padding-top: 8px; border-top: 1px solid {BORDER};'>
+                                    📍 {locations_text}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with col2:
+                    st.markdown("<br><br>", unsafe_allow_html=True)
+                    available_dealerships = get_available_dealerships(item)
+                    
+                    if len(available_dealerships) == 1:
+                        if st.button("ADD TO ORDER", key=f"add_list_{item['id']}", use_container_width=True, type="primary"):
+                            add_to_cart(item, available_dealerships[0])
+                            st.success("✅ Added!")
+                            st.rerun()
+                    else:
+                        selected_loc = st.selectbox(
+                            "Collection from",
+                            available_dealerships,
+                            key=f"loc_list_{item['id']}",
+                            label_visibility="collapsed"
+                        )
+                        if st.button("ADD", key=f"add_list_{item['id']}", use_container_width=True, type="primary"):
+                            add_to_cart(item, selected_loc)
+                            st.success("✅ Added!")
+                            st.rerun()
