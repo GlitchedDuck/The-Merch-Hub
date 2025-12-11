@@ -28,24 +28,23 @@ st.markdown(f"""
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
     
-    /* Primary action buttons - sleek red */
+    /* Primary action buttons - bright red like screenshot */
     .stButton > button[kind="primary"] {{
-        background-color: {PRIMARY};
+        background-color: #ef4444;
         color: white;
         border: none;
         border-radius: 0;
-        font-weight: 500;
-        letter-spacing: 1px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
         text-transform: uppercase;
-        font-size: 11px;
-        padding: 14px 28px;
-        transition: all 0.3s ease;
+        font-size: 12px;
+        padding: 12px 20px;
+        transition: all 0.2s ease;
     }}
     
     .stButton > button[kind="primary"]:hover {{
-        background-color: {SECONDARY};
+        background-color: #dc2626;
         border: none;
-        transform: translateY(-1px);
     }}
     
     /* Secondary buttons */
@@ -393,18 +392,18 @@ def get_cart_count():
 # MAIN APP
 # ============================================================================
 
-# Header - ultra minimal
+# Header - compact and clean
 st.markdown(f"""
-<div style='background: white; padding: 48px 24px; border-bottom: 1px solid {BORDER};'>
+<div style='background: white; padding: 24px 20px; border-bottom: 1px solid {BORDER};'>
     <div style='max-width: 1200px; margin: 0 auto; text-align: center;'>
-        <h1 style='color: {PRIMARY}; margin: 0; font-size: 28px; font-weight: 400; letter-spacing: 3px;'>THE MERCH HUB</h1>
+        <h1 style='color: {PRIMARY}; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 2px;'>THE MERCH HUB</h1>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 # Sidebar - ultra minimal
 with st.sidebar:
-    st.markdown("<div style='margin-bottom: 32px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom: 16px;'></div>", unsafe_allow_html=True)
     
     # Dealership filter only
     selected_dealership = st.selectbox(
@@ -418,7 +417,7 @@ with st.sidebar:
     else:
         st.session_state.selected_dealership = None
     
-    st.markdown("<div style='margin: 32px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin: 24px 0;'></div>", unsafe_allow_html=True)
     
     # Cart summary - minimal
     cart_count = get_cart_count()
@@ -426,20 +425,20 @@ with st.sidebar:
     
     if cart_count > 0:
         st.markdown(f"""
-        <div style='background: {PRIMARY}; color: white; padding: 24px; text-align: center;'>
-            <div style='font-size: 13px; opacity: 0.7; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;'>Order</div>
-            <div style='font-size: 32px; font-weight: 300; margin-bottom: 16px;'>£{cart_total:.2f}</div>
-            <div style='font-size: 12px; opacity: 0.7;'>{cart_count} item{"s" if cart_count != 1 else ""}</div>
+        <div style='background: {PRIMARY}; color: white; padding: 20px; text-align: center;'>
+            <div style='font-size: 12px; opacity: 0.7; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;'>Order</div>
+            <div style='font-size: 28px; font-weight: 300; margin-bottom: 12px;'>£{cart_total:.2f}</div>
+            <div style='font-size: 11px; opacity: 0.7;'>{cart_count} item{"s" if cart_count != 1 else ""}</div>
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='margin: 12px 0;'></div>", unsafe_allow_html=True)
         
         if st.button("View Order", use_container_width=True, type="primary"):
             st.session_state.show_cart = True
             st.rerun()
     
-    st.markdown("<div style='margin: 48px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin: 32px 0;'></div>", unsafe_allow_html=True)
     
     # Minimal filters
     with st.expander("Filters", expanded=False):
@@ -640,9 +639,9 @@ else:
     )
     
     # Results header - minimal
-    st.markdown("<div style='margin: 48px 0 24px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin: 24px 0 16px 0;'></div>", unsafe_allow_html=True)
     
-    st.markdown(f"<p style='color: {ACCENT}; font-size: 13px; margin: 0 0 24px 0; letter-spacing: 0.5px;'>{len(filtered_catalog)} items available</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color: {ACCENT}; font-size: 13px; margin: 0 0 16px 0; letter-spacing: 0.5px;'>{len(filtered_catalog)} items available</p>", unsafe_allow_html=True)
     
     # Sort results by name for clean display
     filtered_catalog = sorted(filtered_catalog, key=lambda x: x['name'])
@@ -665,7 +664,7 @@ else:
         
         for idx, brand in enumerate(sorted_brands):
             with tabs[idx]:
-                st.markdown("<div style='margin: 32px 0;'></div>", unsafe_allow_html=True)
+                st.markdown("<div style='margin: 20px 0 16px 0;'></div>", unsafe_allow_html=True)
                 brand_items = brands_in_catalog[brand]
                 
                 # 4-column grid
@@ -676,55 +675,65 @@ else:
                         if i + j < len(brand_items):
                             item = brand_items[i + j]
                             with col:
-                                # Availability
+                                # Availability with location info
                                 if item['stock_type'] == 'special_order':
                                     avail_color = "#ff9800"
-                                    avail_icon = "⚠"
+                                    avail_icon = "⚠️"
                                     avail_text = f"Special Order +£{item['special_order_fee']:.0f}"
                                 else:
                                     total_stock = sum(item['stock_levels'].values())
                                     if total_stock > 0:
                                         avail_color = "#4caf50"
                                         avail_icon = "✓"
+                                        # Show dealership names (shortened)
+                                        locations = list(item['stock_levels'].keys())
+                                        location_names = [loc.replace('Sytner ', '').replace(' BMW', '').replace(' Audi', '').replace(' Mercedes-Benz', '').replace(' Jaguar Land Rover', '') for loc in locations]
                                         avail_text = f"{total_stock} in stock"
                                     else:
                                         continue
                                 
-                                # Product card
+                                # Product card - awesome compact design
                                 st.markdown(f"""
-                                <div style='background: white; border: 1px solid {BORDER}; margin-bottom: 24px;'>
-                                    <div style='background: {LIGHT_GREY}; padding: 48px 20px; text-align: center;'>
-                                        <div style='font-size: 56px;'>{item['image']}</div>
+                                <div style='background: white; border: 1px solid {BORDER}; margin-bottom: 16px;'>
+                                    <div style='background: {LIGHT_GREY}; padding: 32px 16px; text-align: center;'>
+                                        <div style='font-size: 48px;'>{item['image']}</div>
                                     </div>
-                                    <div style='padding: 24px 20px;'>
-                                        <div style='font-size: 15px; font-weight: 500; color: {PRIMARY}; margin-bottom: 12px; min-height: 44px; line-height: 1.5;'>
+                                    <div style='padding: 16px;'>
+                                        <div style='font-size: 13px; font-weight: 600; color: {PRIMARY}; margin-bottom: 8px; min-height: 40px; line-height: 1.4; text-transform: uppercase;'>
                                             {item['name']}
                                         </div>
-                                        <div style='font-size: 11px; color: {ACCENT}; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.8px;'>
-                                            {item['category']}
+                                        <div style='font-size: 10px; color: {ACCENT}; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;'>
+                                            {item['brand']} • {item['category']}
                                         </div>
-                                        <div style='padding: 16px 0; margin-bottom: 20px; border-top: 1px solid {BORDER}; border-bottom: 1px solid {BORDER};'>
-                                            <div style='font-size: 26px; font-weight: 300; color: {PRIMARY}; text-align: center;'>£{item['price']:.2f}</div>
+                                        <div style='background: {LIGHT_GREY}; padding: 10px; margin-bottom: 12px; text-align: center;'>
+                                            <div style='font-size: 22px; font-weight: 600; color: {PRIMARY};'>£{item['price']:.2f}</div>
                                         </div>
-                                        <div style='font-size: 11px; font-weight: 500; text-align: center; color: {avail_color}; margin-bottom: 16px;'>
+                                        <div style='font-size: 11px; font-weight: 500; color: {avail_color}; margin-bottom: 12px;'>
                                             {avail_icon} {avail_text}
                                         </div>
                                     </div>
                                 </div>
                                 """, unsafe_allow_html=True)
                                 
-                                # Add button
+                                # Add button with location info
                                 if item['stock_type'] == 'special_order':
                                     available_locs = list(DEALERSHIPS.keys())
                                 else:
                                     available_locs = list(item['stock_levels'].keys())
                                 
+                                # Show locations for in-stock items
+                                if item['stock_type'] != 'special_order' and len(available_locs) > 0:
+                                    loc_display = ', '.join([loc.replace('Sytner ', '') for loc in available_locs[:2]])
+                                    if len(available_locs) > 2:
+                                        loc_display += f" +{len(available_locs)-2} more"
+                                    st.markdown(f"<div style='font-size: 10px; color: {ACCENT}; margin-bottom: 12px;'>📍 {loc_display}</div>", unsafe_allow_html=True)
+                                
                                 if len(available_locs) == 1:
-                                    if st.button("Add to Order", key=f"add_{item['id']}", use_container_width=True, type="primary"):
+                                    if st.button("ADD TO ORDER", key=f"add_{item['id']}", use_container_width=True, type="primary"):
                                         add_to_cart(item, available_locs[0])
                                         st.rerun()
                                 else:
                                     selected_loc = st.selectbox("Collection", available_locs, key=f"loc_{item['id']}", label_visibility="collapsed")
-                                    if st.button("Add", key=f"add_{item['id']}", use_container_width=True, type="primary"):
+                                    if st.button("ADD", key=f"add_{item['id']}", use_container_width=True, type="primary"):
                                         add_to_cart(item, selected_loc)
                                         st.rerun()
