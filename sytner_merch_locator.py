@@ -28,23 +28,24 @@ st.markdown(f"""
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
     
-    /* Primary action buttons - solid red */
+    /* Primary action buttons - sleek red */
     .stButton > button[kind="primary"] {{
-        background-color: #e53935;
+        background-color: {PRIMARY};
         color: white;
         border: none;
         border-radius: 0;
-        font-weight: 600;
-        letter-spacing: 0.5px;
+        font-weight: 500;
+        letter-spacing: 1px;
         text-transform: uppercase;
-        font-size: 13px;
-        padding: 12px 24px;
-        transition: all 0.2s ease;
+        font-size: 11px;
+        padding: 14px 28px;
+        transition: all 0.3s ease;
     }}
     
     .stButton > button[kind="primary"]:hover {{
-        background-color: #c62828;
+        background-color: {SECONDARY};
         border: none;
+        transform: translateY(-1px);
     }}
     
     /* Secondary buttons */
@@ -392,98 +393,81 @@ def get_cart_count():
 # MAIN APP
 # ============================================================================
 
-# Header
+# Header - ultra minimal
 st.markdown(f"""
-<div style='background: white; padding: 32px 24px; border-bottom: 1px solid {BORDER}; text-align: center;'>
-    <h1 style='color: {PRIMARY}; margin: 0 0 8px 0; font-size: 36px; font-weight: 600; letter-spacing: 1px;'>THE MERCH HUB</h1>
-    <p style='color: {ACCENT}; font-size: 14px; margin: 0; font-weight: 400;'>Sytner Head Office • Premium Branded Merchandise</p>
+<div style='background: white; padding: 48px 24px; border-bottom: 1px solid {BORDER};'>
+    <div style='max-width: 1200px; margin: 0 auto; text-align: center;'>
+        <h1 style='color: {PRIMARY}; margin: 0; font-size: 28px; font-weight: 400; letter-spacing: 3px;'>THE MERCH HUB</h1>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Sidebar
+# Sidebar - ultra minimal
 with st.sidebar:
-    st.markdown("### Collection Location")
+    st.markdown("<div style='margin-bottom: 32px;'></div>", unsafe_allow_html=True)
     
+    # Dealership filter only
     selected_dealership = st.selectbox(
-        "Filter by dealership",
+        "Location",
         ["All Dealerships"] + sorted(DEALERSHIPS.keys()),
         key="dealership_selector"
     )
     
     if selected_dealership != "All Dealerships":
         st.session_state.selected_dealership = selected_dealership
-        dealership_info = DEALERSHIPS[selected_dealership]
-        st.markdown(f"""
-        <div style='background: white; padding: 14px; border: 1px solid {BORDER}; margin: 12px 0;'>
-            <div style='font-size: 10px; color: {ACCENT}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;'>Region</div>
-            <div style='font-size: 14px; color: {PRIMARY}; font-weight: 600; margin-bottom: 12px;'>{dealership_info['region']}</div>
-            <div style='font-size: 10px; color: {ACCENT}; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;'>Available Brands</div>
-            <div style='font-size: 13px; color: {PRIMARY};'>{' • '.join(dealership_info['brands'])}</div>
-        </div>
-        """, unsafe_allow_html=True)
     else:
         st.session_state.selected_dealership = None
     
-    st.markdown("---")
-    st.markdown("### Your Order")
+    st.markdown("<div style='margin: 32px 0;'></div>", unsafe_allow_html=True)
     
+    # Cart summary - minimal
     cart_count = get_cart_count()
     cart_total = get_cart_total()
     
     if cart_count > 0:
         st.markdown(f"""
-        <div style='background: white; border: 2px solid {PRIMARY}; padding: 20px; text-align: center;'>
-            <div style='font-size: 32px; font-weight: 600; color: {PRIMARY}; margin-bottom: 4px;'>{cart_count}</div>
-            <div style='font-size: 11px; color: {ACCENT}; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px;'>Items</div>
-            <div style='font-size: 24px; font-weight: 600; color: {PRIMARY};'>£{cart_total:.2f}</div>
+        <div style='background: {PRIMARY}; color: white; padding: 24px; text-align: center;'>
+            <div style='font-size: 13px; opacity: 0.7; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;'>Order</div>
+            <div style='font-size: 32px; font-weight: 300; margin-bottom: 16px;'>£{cart_total:.2f}</div>
+            <div style='font-size: 12px; opacity: 0.7;'>{cart_count} item{"s" if cart_count != 1 else ""}</div>
         </div>
         """, unsafe_allow_html=True)
         
-        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("<div style='margin: 16px 0;'></div>", unsafe_allow_html=True)
         
-        if st.button("VIEW ORDER", use_container_width=True, type="primary"):
+        if st.button("View Order", use_container_width=True, type="primary"):
             st.session_state.show_cart = True
             st.rerun()
-    else:
-        st.info("Your order is empty")
     
-    st.markdown("---")
-    st.markdown("### Filters")
+    st.markdown("<div style='margin: 48px 0;'></div>", unsafe_allow_html=True)
     
-    # Brand filter
-    brands = ["All Brands"] + sorted(list(set(item['brand'] for item in MERCHANDISE_CATALOG)))
-    brand_filter = st.selectbox("Brand", brands)
-    
-    # Category filter
-    categories = ["All Categories"] + sorted(list(set(item['category'] for item in MERCHANDISE_CATALOG)))
-    category_filter = st.selectbox("Category", categories)
-    
-    # Stock availability
-    stock_filter = st.radio("Availability", ["All Items", "In Stock Only", "Special Order Only"])
-    
-    # Price range
-    st.markdown("**Price Range**")
-    price_range = st.slider("Price Range", 0, 200, (0, 200), 10, label_visibility="collapsed")
-    
-    # Search
-    search_term = st.text_input("Search", placeholder="Search products...")
-    
-    if st.button("CLEAR FILTERS", use_container_width=True):
-        st.session_state.dealership_selector = "All Dealerships"
-        st.rerun()
+    # Minimal filters
+    with st.expander("Filters", expanded=False):
+        brands = ["All Brands"] + sorted(list(set(item['brand'] for item in MERCHANDISE_CATALOG)))
+        brand_filter = st.selectbox("Brand", brands)
+        
+        categories = ["All Categories"] + sorted(list(set(item['category'] for item in MERCHANDISE_CATALOG)))
+        category_filter = st.selectbox("Category", categories)
+        
+        stock_filter = st.radio("Stock", ["All Items", "In Stock Only", "Special Order Only"])
+        
+        st.markdown("**Price**")
+        price_range = st.slider("Price Range", 0, 200, (0, 200), 10, label_visibility="collapsed")
+        
+        search_term = st.text_input("Search", placeholder="Search...")
 
 # Main content area
 if st.session_state.show_cart:
     # CART PAGE
-    st.markdown("### 🛒 YOUR COLLECTION ORDER")
+    st.markdown("<div style='margin: 48px 0 32px 0;'></div>", unsafe_allow_html=True)
     
-    col_back, col_space = st.columns([1, 3])
+    col_back, col_space = st.columns([1, 4])
     with col_back:
-        if st.button("← BACK TO CATALOG"):
+        if st.button("← Back"):
             st.session_state.show_cart = False
             st.rerun()
     
-    st.markdown("---")
+    st.markdown("<div style='margin: 32px 0;'></div>", unsafe_allow_html=True)
     
     if not st.session_state.cart:
         st.info("Your order is empty. Browse the catalog to add items.")
@@ -655,12 +639,13 @@ else:
         price_range=price_range if price_range != (0, 200) else None
     )
     
-    # Results header
-    col1, col2, col3 = st.columns([2, 1, 1])
+    # Results header - minimal
+    st.markdown("<div style='margin: 48px 0 32px 0;'></div>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([3, 1, 1])
     
     with col1:
-        st.markdown(f"### Available Merchandise")
-        st.markdown(f"<p style='color: {ACCENT}; font-size: 14px; margin-top: -8px;'>Showing {len(filtered_catalog)} of {len(MERCHANDISE_CATALOG)} items</p>", unsafe_allow_html=True)
+        st.markdown(f"<p style='color: {ACCENT}; font-size: 13px; margin: 0; letter-spacing: 0.5px;'>{len(filtered_catalog)} items</p>", unsafe_allow_html=True)
     
     with col2:
         sort_by = st.selectbox(
@@ -688,8 +673,6 @@ else:
         filtered_catalog = sorted(filtered_catalog, key=lambda x: x['category'])
     else:  # Name A-Z
         filtered_catalog = sorted(filtered_catalog, key=lambda x: x['name'])
-    
-    st.markdown("---")
     
     if not filtered_catalog:
         st.warning("No products found matching your filters. Try adjusting your search criteria.")
@@ -722,49 +705,45 @@ else:
                                 else:
                                     continue  # Skip items with no stock
                             
-                            # Product card - professional design
+                            # Product card - sleek minimal design
                             st.markdown(f"""
-                            <div style='background: white; padding: 0; border: 1px solid {BORDER}; margin-bottom: 20px; overflow: hidden;'>
-                                <div style='background: {LIGHT_GREY}; padding: 40px 20px; text-align: center; border-bottom: 1px solid {BORDER};'>
-                                    <div style='font-size: 64px; margin: 0;'>{item['image']}</div>
+                            <div style='background: white; border: 1px solid {BORDER}; margin-bottom: 24px; overflow: hidden; transition: all 0.2s;'>
+                                <div style='background: {LIGHT_GREY}; padding: 48px 20px; text-align: center;'>
+                                    <div style='font-size: 56px;'>{item['image']}</div>
                                 </div>
-                                <div style='padding: 20px;'>
-                                    <div style='font-size: 16px; font-weight: 600; color: {PRIMARY}; margin-bottom: 8px; min-height: 48px; line-height: 1.4;'>
+                                <div style='padding: 24px 20px;'>
+                                    <div style='font-size: 15px; font-weight: 500; color: {PRIMARY}; margin-bottom: 12px; min-height: 44px; line-height: 1.5;'>
                                         {item['name']}
                                     </div>
-                                    <div style='font-size: 11px; color: {ACCENT}; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;'>
-                                        {item['brand']} • {item['category']}
+                                    <div style='font-size: 11px; color: {ACCENT}; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.8px;'>
+                                        {item['brand']}
                                     </div>
-                                    <div style='background: {LIGHT_GREY}; padding: 12px; margin-bottom: 16px; text-align: center;'>
-                                        <div style='font-size: 28px; font-weight: 600; color: {PRIMARY};'>£{item['price']:.2f}</div>
+                                    <div style='padding: 16px 0; margin-bottom: 20px; border-top: 1px solid {BORDER}; border-bottom: 1px solid {BORDER};'>
+                                        <div style='font-size: 26px; font-weight: 300; color: {PRIMARY}; text-align: center;'>£{item['price']:.2f}</div>
                                     </div>
-                                    <div style='font-size: 12px; font-weight: 500; padding: 8px 0; border-top: 1px solid {BORDER}; text-align: center;'>
-                                        <span style='color: {avail_color};'>{avail_icon} {avail_text}</span>
+                                    <div style='font-size: 11px; font-weight: 500; text-align: center; color: {avail_color};'>
+                                        {avail_icon} {avail_text}
                                     </div>
                                 </div>
                             </div>
                             """, unsafe_allow_html=True)
                             
-                            # Add to cart button
+                            # Add button - simple and clean
                             available_dealerships = get_available_dealerships(item)
                             
                             if len(available_dealerships) == 1:
-                                # Only one location - direct add button
-                                if st.button("ADD TO ORDER", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
+                                if st.button("Add to Order", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
                                     add_to_cart(item, available_dealerships[0])
-                                    st.success("✅ Added to order!")
                                     st.rerun()
                             else:
-                                # Multiple locations - show selector first then button
                                 selected_loc = st.selectbox(
-                                    "Select collection point",
+                                    "Collection point",
                                     available_dealerships,
                                     key=f"loc_grid_{item['id']}",
                                     label_visibility="collapsed"
                                 )
-                                if st.button("ADD", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
+                                if st.button("Add to Order", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
                                     add_to_cart(item, selected_loc)
-                                    st.success("✅ Added to order!")
                                     st.rerun()
         
         else:
