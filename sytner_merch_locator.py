@@ -640,171 +640,91 @@ else:
     )
     
     # Results header - minimal
-    st.markdown("<div style='margin: 48px 0 32px 0;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin: 48px 0 24px 0;'></div>", unsafe_allow_html=True)
     
-    col1, col2, col3 = st.columns([3, 1, 1])
+    st.markdown(f"<p style='color: {ACCENT}; font-size: 13px; margin: 0 0 24px 0; letter-spacing: 0.5px;'>{len(filtered_catalog)} items available</p>", unsafe_allow_html=True)
     
-    with col1:
-        st.markdown(f"<p style='color: {ACCENT}; font-size: 13px; margin: 0; letter-spacing: 0.5px;'>{len(filtered_catalog)} items</p>", unsafe_allow_html=True)
-    
-    with col2:
-        sort_by = st.selectbox(
-            "Sort by",
-            ["Name A-Z", "Price Low-High", "Price High-Low", "Brand", "Category"],
-            label_visibility="collapsed"
-        )
-    
-    with col3:
-        view_mode = st.radio(
-            "View",
-            ["Grid", "List"],
-            horizontal=True,
-            label_visibility="collapsed"
-        )
-    
-    # Sort results
-    if sort_by == "Price Low-High":
-        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['price'])
-    elif sort_by == "Price High-Low":
-        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['price'], reverse=True)
-    elif sort_by == "Brand":
-        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['brand'])
-    elif sort_by == "Category":
-        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['category'])
-    else:  # Name A-Z
-        filtered_catalog = sorted(filtered_catalog, key=lambda x: x['name'])
+    # Sort results by name for clean display
+    filtered_catalog = sorted(filtered_catalog, key=lambda x: x['name'])
     
     if not filtered_catalog:
-        st.warning("No products found matching your filters. Try adjusting your search criteria.")
+        st.warning("No products found matching your filters.")
     else:
-        if view_mode == "Grid":
-            # Grid view - 4 columns
-            cols_per_row = 4
-            for i in range(0, len(filtered_catalog), cols_per_row):
-                cols = st.columns(cols_per_row)
-                for j, col in enumerate(cols):
-                    if i + j < len(filtered_catalog):
-                        item = filtered_catalog[i + j]
-                        with col:
-                            # Availability status
-                            if item['stock_type'] == 'special_order':
-                                avail_color = "#ff9800"
-                                avail_icon = "⚠️"
-                                avail_text = f"Special Order +£{item['special_order_fee']:.1f}"
-                                total_stock = "N/A"
-                            else:
-                                total_stock = get_total_stock(item)
-                                if total_stock > 20:
-                                    avail_color = "#4caf50"
-                                    avail_icon = "✓"
-                                    avail_text = f"{total_stock} in stock"
-                                elif total_stock > 0:
-                                    avail_color = "#4caf50"
-                                    avail_icon = "✓"
-                                    avail_text = f"{total_stock} in stock"
-                                else:
-                                    continue  # Skip items with no stock
-                            
-                            # Product card - sleek minimal design
-                            st.markdown(f"""
-                            <div style='background: white; border: 1px solid {BORDER}; margin-bottom: 24px; overflow: hidden; transition: all 0.2s;'>
-                                <div style='background: {LIGHT_GREY}; padding: 48px 20px; text-align: center;'>
-                                    <div style='font-size: 56px;'>{item['image']}</div>
-                                </div>
-                                <div style='padding: 24px 20px;'>
-                                    <div style='font-size: 15px; font-weight: 500; color: {PRIMARY}; margin-bottom: 12px; min-height: 44px; line-height: 1.5;'>
-                                        {item['name']}
-                                    </div>
-                                    <div style='font-size: 11px; color: {ACCENT}; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.8px;'>
-                                        {item['brand']}
-                                    </div>
-                                    <div style='padding: 16px 0; margin-bottom: 20px; border-top: 1px solid {BORDER}; border-bottom: 1px solid {BORDER};'>
-                                        <div style='font-size: 26px; font-weight: 300; color: {PRIMARY}; text-align: center;'>£{item['price']:.2f}</div>
-                                    </div>
-                                    <div style='font-size: 11px; font-weight: 500; text-align: center; color: {avail_color};'>
-                                        {avail_icon} {avail_text}
-                                    </div>
-                                </div>
-                            </div>
-                            """, unsafe_allow_html=True)
-                            
-                            # Add button - simple and clean
-                            available_dealerships = get_available_dealerships(item)
-                            
-                            if len(available_dealerships) == 1:
-                                if st.button("Add to Order", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
-                                    add_to_cart(item, available_dealerships[0])
-                                    st.rerun()
-                            else:
-                                selected_loc = st.selectbox(
-                                    "Collection point",
-                                    available_dealerships,
-                                    key=f"loc_grid_{item['id']}",
-                                    label_visibility="collapsed"
-                                )
-                                if st.button("Add to Order", key=f"add_grid_{item['id']}", use_container_width=True, type="primary"):
-                                    add_to_cart(item, selected_loc)
-                                    st.rerun()
+        # Group products by brand for tabs
+        brands_in_catalog = {}
+        for item in filtered_catalog:
+            brand = item['brand']
+            if brand not in brands_in_catalog:
+                brands_in_catalog[brand] = []
+            brands_in_catalog[brand].append(item)
         
-        else:
-            # List view
-            for item in filtered_catalog:
-                col1, col2 = st.columns([3, 1])
+        sorted_brands = sorted(brands_in_catalog.keys())
+        
+        # Create tabs for each brand
+        tabs = st.tabs(sorted_brands)
+        
+        for idx, brand in enumerate(sorted_brands):
+            with tabs[idx]:
+                st.markdown("<div style='margin: 32px 0;'></div>", unsafe_allow_html=True)
+                brand_items = brands_in_catalog[brand]
                 
-                with col1:
-                    # Availability
-                    if item['stock_type'] == 'special_order':
-                        avail_badge = f"<span style='background:#ff9800; color:white; padding:3px 8px; font-size:10px; border-radius:0; text-transform:uppercase;'>Special Order +£{item['special_order_fee']}</span>"
-                        locations_text = "Available from any dealership"
-                    else:
-                        total_stock = get_total_stock(item)
-                        if total_stock == 0:
-                            continue
-                        avail_badge = f"<span style='background:{SUCCESS}; color:white; padding:3px 8px; font-size:10px; border-radius:0; text-transform:uppercase;'>✓ {total_stock} in Stock</span>"
-                        locations = ', '.join(item['stock_levels'].keys())
-                        locations_text = f"Available at: {locations}"
-                    
-                    st.markdown(f"""
-                    <div style='background: white; padding: 20px; border: 1px solid {BORDER}; margin-bottom: 16px;'>
-                        <div style='display: flex; align-items: start;'>
-                            <div style='font-size: 48px; margin-right: 20px;'>{item['image']}</div>
-                            <div style='flex: 1;'>
-                                <h4 style='color: {PRIMARY}; margin: 0 0 8px 0; font-size: 15px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;'>
-                                    {item['name']} {avail_badge}
-                                </h4>
-                                <p style='color: {ACCENT}; font-size: 13px; margin: 0 0 12px 0; line-height: 1.6;'>
-                                    {item['description']}
-                                </p>
-                                <div style='display: flex; gap: 20px; align-items: center; font-size: 12px; color: {ACCENT};'>
-                                    <span><strong>Brand:</strong> {item['brand']}</span>
-                                    <span><strong>Category:</strong> {item['category']}</span>
-                                    <span><strong>Price:</strong> <span style='font-size:18px; color:{PRIMARY}; font-weight:300;'>£{item['price']:.2f}</span></span>
+                # 4-column grid
+                cols_per_row = 4
+                for i in range(0, len(brand_items), cols_per_row):
+                    cols = st.columns(cols_per_row)
+                    for j, col in enumerate(cols):
+                        if i + j < len(brand_items):
+                            item = brand_items[i + j]
+                            with col:
+                                # Availability
+                                if item['stock_type'] == 'special_order':
+                                    avail_color = "#ff9800"
+                                    avail_icon = "⚠"
+                                    avail_text = f"Special Order +£{item['special_order_fee']:.0f}"
+                                else:
+                                    total_stock = sum(item['stock_levels'].values())
+                                    if total_stock > 0:
+                                        avail_color = "#4caf50"
+                                        avail_icon = "✓"
+                                        avail_text = f"{total_stock} in stock"
+                                    else:
+                                        continue
+                                
+                                # Product card
+                                st.markdown(f"""
+                                <div style='background: white; border: 1px solid {BORDER}; margin-bottom: 24px;'>
+                                    <div style='background: {LIGHT_GREY}; padding: 48px 20px; text-align: center;'>
+                                        <div style='font-size: 56px;'>{item['image']}</div>
+                                    </div>
+                                    <div style='padding: 24px 20px;'>
+                                        <div style='font-size: 15px; font-weight: 500; color: {PRIMARY}; margin-bottom: 12px; min-height: 44px; line-height: 1.5;'>
+                                            {item['name']}
+                                        </div>
+                                        <div style='font-size: 11px; color: {ACCENT}; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.8px;'>
+                                            {item['category']}
+                                        </div>
+                                        <div style='padding: 16px 0; margin-bottom: 20px; border-top: 1px solid {BORDER}; border-bottom: 1px solid {BORDER};'>
+                                            <div style='font-size: 26px; font-weight: 300; color: {PRIMARY}; text-align: center;'>£{item['price']:.2f}</div>
+                                        </div>
+                                        <div style='font-size: 11px; font-weight: 500; text-align: center; color: {avail_color}; margin-bottom: 16px;'>
+                                            {avail_icon} {avail_text}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style='font-size: 11px; color: {ACCENT}; margin-top: 8px; padding-top: 8px; border-top: 1px solid {BORDER};'>
-                                    📍 {locations_text}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                
-                with col2:
-                    st.markdown("<br><br>", unsafe_allow_html=True)
-                    available_dealerships = get_available_dealerships(item)
-                    
-                    if len(available_dealerships) == 1:
-                        if st.button("ADD TO ORDER", key=f"add_list_{item['id']}", use_container_width=True, type="primary"):
-                            add_to_cart(item, available_dealerships[0])
-                            st.success("✅ Added!")
-                            st.rerun()
-                    else:
-                        selected_loc = st.selectbox(
-                            "Collection from",
-                            available_dealerships,
-                            key=f"loc_list_{item['id']}",
-                            label_visibility="collapsed"
-                        )
-                        if st.button("ADD", key=f"add_list_{item['id']}", use_container_width=True, type="primary"):
-                            add_to_cart(item, selected_loc)
-                            st.success("✅ Added!")
-                            st.rerun()
+                                """, unsafe_allow_html=True)
+                                
+                                # Add button
+                                if item['stock_type'] == 'special_order':
+                                    available_locs = list(DEALERSHIPS.keys())
+                                else:
+                                    available_locs = list(item['stock_levels'].keys())
+                                
+                                if len(available_locs) == 1:
+                                    if st.button("Add to Order", key=f"add_{item['id']}", use_container_width=True, type="primary"):
+                                        add_to_cart(item, available_locs[0])
+                                        st.rerun()
+                                else:
+                                    selected_loc = st.selectbox("Collection", available_locs, key=f"loc_{item['id']}", label_visibility="collapsed")
+                                    if st.button("Add", key=f"add_{item['id']}", use_container_width=True, type="primary"):
+                                        add_to_cart(item, selected_loc)
+                                        st.rerun()
