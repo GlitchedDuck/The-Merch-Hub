@@ -9,28 +9,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Sytner authentic brand colors
-PRIMARY = "#1a1a1a"
-SECONDARY = "#333333"
-ACCENT = "#666666"
+# Sytner official brand colors
+PRIMARY = "#0d2d4a"  # Dark navy blue - Sytner primary
+ACCENT = "#0088ce"   # Bright blue - Sytner accent/CTA
+SECONDARY = "#1a4569"  # Slightly lighter navy
 LIGHT_GREY = "#f5f5f5"
 BORDER = "#e5e5e5"
+TEXT_GREY = "#666666"
 SUCCESS = "#22c55e"
 
 # Custom CSS - Sytner minimal aesthetic
 st.markdown(f"""
 <style>
     .stApp {{
-        background-color: {LIGHT_GREY};
+        background-color: #f8f9fa;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
     }}
     
     #MainMenu {{visibility: hidden;}}
     footer {{visibility: hidden;}}
     
-    /* Primary action buttons - bright red like screenshot */
+    /* Primary action buttons - Sytner bright blue */
     .stButton > button[kind="primary"] {{
-        background-color: #ef4444;
+        background-color: {ACCENT};
         color: white;
         border: none;
         border-radius: 0;
@@ -43,11 +44,11 @@ st.markdown(f"""
     }}
     
     .stButton > button[kind="primary"]:hover {{
-        background-color: #dc2626;
+        background-color: #006ba6;
         border: none;
     }}
     
-    /* Secondary buttons */
+    /* Secondary buttons - Sytner navy outline */
     .stButton > button {{
         background-color: white;
         color: {PRIMARY};
@@ -69,23 +70,24 @@ st.markdown(f"""
     .stTabs [data-baseweb="tab-list"] {{
         gap: 0;
         border-bottom: 2px solid {BORDER};
+        background-color: white;
     }}
     
     .stTabs [data-baseweb="tab"] {{
         background-color: transparent;
         border-radius: 0;
-        padding: 16px 32px;
-        font-weight: 400;
+        padding: 14px 28px;
+        font-weight: 500;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        font-size: 12px;
-        color: {ACCENT};
+        font-size: 11px;
+        color: {TEXT_GREY};
     }}
     
     .stTabs [aria-selected="true"] {{
         background-color: transparent;
         color: {PRIMARY};
-        border-bottom: 3px solid {PRIMARY};
+        border-bottom: 3px solid {ACCENT};
     }}
     
     .stTextInput > div > div > input {{
@@ -392,11 +394,12 @@ def get_cart_count():
 # MAIN APP
 # ============================================================================
 
-# Header - compact and clean
+# Header - Sytner branded
 st.markdown(f"""
-<div style='background: white; padding: 24px 20px; border-bottom: 1px solid {BORDER};'>
+<div style='background: {PRIMARY}; padding: 20px; border-bottom: 3px solid {ACCENT};'>
     <div style='max-width: 1200px; margin: 0 auto; text-align: center;'>
-        <h1 style='color: {PRIMARY}; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 2px;'>THE MERCH HUB</h1>
+        <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 600; letter-spacing: 2px;'>THE MERCH HUB</h1>
+        <p style='color: rgba(255,255,255,0.8); font-size: 12px; margin: 8px 0 0 0; letter-spacing: 1px;'>SYTNER GROUP</p>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -641,7 +644,7 @@ else:
     # Results header - minimal
     st.markdown("<div style='margin: 24px 0 16px 0;'></div>", unsafe_allow_html=True)
     
-    st.markdown(f"<p style='color: {ACCENT}; font-size: 13px; margin: 0 0 16px 0; letter-spacing: 0.5px;'>{len(filtered_catalog)} items available</p>", unsafe_allow_html=True)
+    st.markdown(f"<p style='color: {TEXT_GREY}; font-size: 13px; margin: 0 0 16px 0; letter-spacing: 0.5px;'>{len(filtered_catalog)} items available</p>", unsafe_allow_html=True)
     
     # Sort results by name for clean display
     filtered_catalog = sorted(filtered_catalog, key=lambda x: x['name'])
@@ -702,7 +705,7 @@ else:
                                         <div style='font-size: 13px; font-weight: 600; color: {PRIMARY}; margin-bottom: 8px; min-height: 40px; line-height: 1.4; text-transform: uppercase;'>
                                             {item['name']}
                                         </div>
-                                        <div style='font-size: 10px; color: {ACCENT}; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;'>
+                                        <div style='font-size: 10px; color: {TEXT_GREY}; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;'>
                                             {item['brand']} • {item['category']}
                                         </div>
                                         <div style='background: {LIGHT_GREY}; padding: 10px; margin-bottom: 12px; text-align: center;'>
@@ -726,7 +729,7 @@ else:
                                     loc_display = ', '.join([loc.replace('Sytner ', '') for loc in available_locs[:2]])
                                     if len(available_locs) > 2:
                                         loc_display += f" +{len(available_locs)-2} more"
-                                    st.markdown(f"<div style='font-size: 10px; color: {ACCENT}; margin-bottom: 12px;'>📍 {loc_display}</div>", unsafe_allow_html=True)
+                                    st.markdown(f"<div style='font-size: 10px; color: {TEXT_GREY}; margin-bottom: 12px;'>📍 {loc_display}</div>", unsafe_allow_html=True)
                                 
                                 if len(available_locs) == 1:
                                     if st.button("ADD TO ORDER", key=f"add_{item['id']}", use_container_width=True, type="primary"):
